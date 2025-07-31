@@ -20,27 +20,27 @@ const AdminLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-      {/* Sidebar */}
-      <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      {/* Main Content */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
-        sidebarOpen ? 'ml-64' : 'ml-0'
-      }`}>
-        {/* Topbar */}
-        <AdminTopbar toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex">
+        {/* Sidebar */}
+        <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
-        {/* Page Content */}
-        <main className="flex-1 flex flex-col">
-          {/* Main Content Area */}
-          <div className="flex-1">
-            {children}
-          </div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
+          {/* Topbar */}
+          <AdminTopbar toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
           
-          {/* Footer */}
-          <AdminFooter />
-        </main>
+          {/* Page Content */}
+          <main className="flex-1 flex flex-col">
+            {/* Main Content Area */}
+            <div className="flex-1">
+              {children}
+            </div>
+            
+            {/* Footer */}
+            <AdminFooter />
+          </main>
+        </div>
       </div>
     </div>
   );
