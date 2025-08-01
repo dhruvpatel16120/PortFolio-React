@@ -56,7 +56,7 @@ const Navbar = () => {
           style={{ fontFamily: 'Dancing Script, Poppins, sans-serif' }}
               className="text-3xl font-semibold tracking-wide text-lightAccent dark:text-darkAccent hover:scale-105 transform transition-all duration-300 font-[Poppins] drop-shadow-lg"
         >
-          {settings.siteName || "Dhruv's PortFolio"}
+          Dhruv's Portfolio
         </Link>
           </div>
 
