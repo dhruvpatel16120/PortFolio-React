@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from '../../firebase/config';
-import securityService from '../services/securityService';
+import { auth } from '../../../firebase/config';
+import securityService from '../../services/securityService';
 
 const SecuritySettings = () => {
   const [currentPassword, setCurrentPassword] = useState('');

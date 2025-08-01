@@ -3,25 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   HiHome,
   HiDocumentText,
-  HiUsers,
-  HiChartBar,
   HiCog,
   HiShieldCheck,
   HiX,
   HiChevronDown,
   HiCheckCircle,
   HiMail,
-  HiFolder,
-  HiPhotograph,
-  HiPresentationChartLine,
   HiUserGroup,
   HiSearch,
-  HiViewBoards,
-  HiClock,
-  HiStar,
   HiTrendingUp,
   HiKey,
-  HiDocumentDuplicate,
   HiGlobeAlt,
   HiChatAlt2
 } from 'react-icons/hi';
@@ -29,10 +20,7 @@ import {
 const AdminSidebar = ({ isOpen, onClose }) => {
   const [expandedSections, setExpandedSections] = useState({
     dashboard: true,
-    content: true,
     contact: true,
-    analytics: false,
-    management: false,
     settings: false
   });
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,43 +32,6 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       path: '/admin',
       icon: <HiHome className="w-5 h-5" />,
       badge: null
-    },
-    {
-      title: 'Content Management',
-      section: 'content',
-      icon: <HiDocumentText className="w-5 h-5" />,
-      items: [
-        { 
-          title: 'Portfolio Content', 
-          path: '/admin/content',
-          icon: <HiDocumentDuplicate className="w-4 h-4" />,
-          description: 'Manage portfolio sections'
-        },
-        { 
-          title: 'Projects', 
-          path: '/admin/projects',
-          icon: <HiFolder className="w-4 h-4" />,
-          description: 'Add and edit projects'
-        },
-        { 
-          title: 'Skills & Experience', 
-          path: '/admin/skills',
-          icon: <HiStar className="w-4 h-4" />,
-          description: 'Update skills and experience'
-        },
-        { 
-          title: 'About Section', 
-          path: '/admin/about',
-          icon: <HiUserGroup className="w-4 h-4" />,
-          description: 'Edit about page content'
-        },
-        { 
-          title: 'Media Gallery', 
-          path: '/admin/media',
-          icon: <HiPhotograph className="w-4 h-4" />,
-          description: 'Manage images and files'
-        }
-      ]
     },
     {
       title: 'Contact Management',
@@ -107,68 +58,6 @@ const AdminSidebar = ({ isOpen, onClose }) => {
           icon: <HiTrendingUp className="w-4 h-4" />,
           description: 'Contact form analytics'
         },
-        { 
-          title: 'Contact Reply', 
-          path: '/admin/contact/reply',
-          icon: <HiMail className="w-4 h-4" />,
-          description: 'Reply to contact messages'
-        }
-      ]
-    },
-    {
-      title: 'Analytics & Reports',
-      section: 'analytics',
-      icon: <HiChartBar className="w-5 h-5" />,
-      items: [
-        { 
-          title: 'Dashboard Analytics', 
-          path: '/admin/analytics',
-          icon: <HiPresentationChartLine className="w-4 h-4" />,
-          description: 'Overview of site metrics'
-        },
-        { 
-          title: 'Visitor Statistics', 
-          path: '/admin/analytics/visitors',
-          icon: <HiViewBoards className="w-4 h-4" />,
-          description: 'Detailed visitor data'
-        },
-        { 
-          title: 'Performance Reports', 
-          path: '/admin/analytics/performance',
-          icon: <HiTrendingUp className="w-4 h-4" />,
-          description: 'Site performance metrics'
-        },
-        { 
-          title: 'Activity Logs', 
-          path: '/admin/analytics/activity',
-          icon: <HiClock className="w-4 h-4" />,
-          description: 'System activity tracking'
-        }
-      ]
-    },
-    {
-      title: 'User Management',
-      section: 'management',
-      icon: <HiUsers className="w-5 h-5" />,
-      items: [
-        { 
-          title: 'User Accounts', 
-          path: '/admin/users',
-          icon: <HiUserGroup className="w-4 h-4" />,
-          description: 'Manage user accounts'
-        },
-        { 
-          title: 'Permissions', 
-          path: '/admin/users/permissions',
-          icon: <HiShieldCheck className="w-4 h-4" />,
-          description: 'User role management'
-        },
-        { 
-          title: 'Activity Logs', 
-          path: '/admin/users/activity',
-          icon: <HiClock className="w-4 h-4" />,
-          description: 'User activity tracking'
-        }
       ]
     },
     {
