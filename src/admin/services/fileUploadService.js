@@ -54,6 +54,22 @@ export class FileUploadService {
 
       const data = await response.json();
 
+      // Create file metadata
+      const fileData = {
+        publicId: data.public_id,
+        url: data.secure_url,
+        type: this.getFileTypeFromUrl(data.secure_url),
+        size: data.bytes,
+        createdAt: new Date(),
+        width: data.width,
+        height: data.height,
+        format: data.format,
+        folder: folder
+      };
+
+      // Store file metadata
+      this.storeFileMetadata(fileData);
+
       return {
         success: true,
         url: data.secure_url,
@@ -90,44 +106,11 @@ export class FileUploadService {
       failed: failed,
       total: files.length,
       successful: successful.length,
-      failed: failed.length
+      failedCount: failed.length
     };
   }
 
-  // Delete file from Cloudinary
-  async deleteFromCloudinary(publicId) {
-    try {
-      if (!this.cloudinaryCloudName) {
-        throw new Error('Cloudinary configuration not found');
-      }
 
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/destroy`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            public_id: publicId,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Delete failed: ${response.statusText}`);
-      }
-
-      return { success: true };
-
-    } catch (error) {
-      console.error('File deletion error:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
 
   // Validate file before upload (supports images and videos)
   validateFile(file) {
@@ -176,6 +159,138 @@ export class FileUploadService {
       console.error('Error getting file info:', error);
       return null;
     }
+  }
+
+  // Get all media files from Cloudinary
+  async getMediaFiles() {
+    try {
+      if (!this.cloudinaryCloudName) {
+        console.warn('Cloudinary cloud name not configured');
+        return [];
+      }
+
+      console.log('Fetching media files from local storage...'); // Debug log
+
+      // Since Cloudinary List API requires authentication, we'll use localStorage
+      // to track uploaded files. This is a simple solution for development.
+      // In production, you should store this data in your database.
+      
+      const storedFiles = localStorage.getItem('cloudinary_media_files');
+      if (storedFiles) {
+        const files = JSON.parse(storedFiles);
+        console.log('Found stored files:', files);
+        return files;
+      }
+      
+      console.log('No stored files found. Upload your first file to get started.');
+      return [];
+
+    } catch (error) {
+      console.error('Error fetching media files:', error);
+      return [];
+    }
+  }
+
+  // Delete file from Cloudinary (with better error handling)
+  async deleteFromCloudinary(publicId) {
+    try {
+      if (!this.cloudinaryCloudName) {
+        console.warn('Cloudinary not configured, simulating deletion');
+        // Remove from localStorage even if Cloudinary is not configured
+        this.removeFileMetadata(publicId);
+        return { success: true };
+      }
+
+      // Try to delete as image first
+      let response = await fetch(
+        `https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/destroy`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            public_id: publicId,
+          }),
+        }
+      );
+
+      // If image deletion fails, try video deletion
+      if (!response.ok) {
+        response = await fetch(
+          `https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/video/destroy`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              public_id: publicId,
+            }),
+          }
+        );
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Delete failed: ${response.statusText} - ${errorData.error?.message || ''}`);
+      }
+
+      // Remove file metadata from localStorage
+      this.removeFileMetadata(publicId);
+
+      return { success: true };
+
+    } catch (error) {
+      console.error('File deletion error:', error);
+      // Even if Cloudinary deletion fails, remove from localStorage
+      this.removeFileMetadata(publicId);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  // Store file metadata in localStorage
+  storeFileMetadata(fileData) {
+    try {
+      const storedFiles = localStorage.getItem('cloudinary_media_files');
+      const existingFiles = storedFiles ? JSON.parse(storedFiles) : [];
+      const updatedFiles = [...existingFiles, fileData];
+      localStorage.setItem('cloudinary_media_files', JSON.stringify(updatedFiles));
+      console.log('File metadata stored:', fileData);
+    } catch (error) {
+      console.error('Error storing file metadata:', error);
+    }
+  }
+
+  // Remove file metadata from localStorage
+  removeFileMetadata(publicId) {
+    try {
+      const storedFiles = localStorage.getItem('cloudinary_media_files');
+      const existingFiles = storedFiles ? JSON.parse(storedFiles) : [];
+      const updatedFiles = existingFiles.filter(file => file.publicId !== publicId);
+      localStorage.setItem('cloudinary_media_files', JSON.stringify(updatedFiles));
+      console.log('File metadata removed:', publicId);
+    } catch (error) {
+      console.error('Error removing file metadata:', error);
+    }
+  }
+
+  // Helper method to determine file type from URL
+  getFileTypeFromUrl(url) {
+    const extension = url.split('.').pop().toLowerCase();
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+    const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'quicktime'];
+    
+    if (imageExtensions.includes(extension)) {
+      return `image/${extension === 'jpg' ? 'jpeg' : extension}`;
+    } else if (videoExtensions.includes(extension)) {
+      return `video/${extension}`;
+    }
+    
+    return 'application/octet-stream';
   }
 
   // Generate thumbnail URL
@@ -265,6 +380,27 @@ export class FileUploadService {
     const transformString = transformParams.join(',');
     
     return `https://res.cloudinary.com/${this.cloudinaryCloudName}/video/upload/${transformString}/${publicId}`;
+  }
+
+  // Transform image (resize, crop, quality, format)
+  transformImage(publicId, transformations = {}) {
+    if (!this.cloudinaryCloudName) {
+      return null;
+    }
+
+    const transformParams = [];
+    
+    if (transformations.width) transformParams.push(`w_${transformations.width}`);
+    if (transformations.height) transformParams.push(`h_${transformations.height}`);
+    if (transformations.crop) transformParams.push(`c_${transformations.crop}`);
+    if (transformations.quality) transformParams.push(`q_${transformations.quality}`);
+    if (transformations.format && transformations.format !== 'auto') {
+      transformParams.push(`f_${transformations.format}`);
+    }
+
+    const transformString = transformParams.join(',');
+    
+    return `https://res.cloudinary.com/${this.cloudinaryCloudName}/image/upload/${transformString}/${publicId}`;
   }
 
   // Delete video from Cloudinary

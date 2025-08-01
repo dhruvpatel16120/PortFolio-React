@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiSun, FiMoon, FiMenu, FiX, FiHome, FiUser, FiBriefcase, FiMail, FiFileText } from 'react-icons/fi';
 import { useTheme } from "../context/ThemeContext";
+import { useSettings } from "../context/SettingsContext";
 
 const Navbar = () => {
   const { darkMode, toggleDarkMode } = useTheme();
+  const { settings } = useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -54,7 +56,7 @@ const Navbar = () => {
           style={{ fontFamily: 'Dancing Script, Poppins, sans-serif' }}
               className="text-3xl font-semibold tracking-wide text-lightAccent dark:text-darkAccent hover:scale-105 transform transition-all duration-300 font-[Poppins] drop-shadow-lg"
         >
-          Dhruv's PortFolio
+          {settings.siteName || "Dhruv's PortFolio"}
         </Link>
           </div>
 

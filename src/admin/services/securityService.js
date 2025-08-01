@@ -10,7 +10,8 @@ import {
   orderBy, 
   getDocs,
   serverTimestamp,
-  increment
+  increment,
+  setDoc
 } from 'firebase/firestore';
 import { 
   signOut, 
@@ -48,6 +49,9 @@ class SecurityService {
 
   async updateLoginStats(email, success = true) {
     try {
+      const userRef = doc(db, 'admin_users', email);
+      const userDoc = await getDoc(userRef);
+      
       const updateData = {
         lastLogin: new Date(),
         isOnline: success,
@@ -62,7 +66,24 @@ class SecurityService {
         updateData.failedAttempts = increment(1);
       }
 
-      await updateDoc(doc(db, 'admin_users', email), updateData);
+      if (userDoc.exists()) {
+        await updateDoc(userRef, updateData);
+      } else {
+        // Create new admin user document if it doesn't exist
+        await setDoc(userRef, {
+          email: email,
+          isActive: true,
+          isOnline: success,
+          loginCount: success ? 1 : 0,
+          failedAttempts: success ? 0 : 1,
+          lastLogin: new Date(),
+          lastLoginIP: await this.getClientIP(),
+          userAgent: navigator.userAgent,
+          createdAt: new Date(),
+          role: 'admin',
+          permissions: ['read', 'write', 'delete', 'manage_users']
+        });
+      }
     } catch (error) {
       console.error('Failed to update login stats:', error);
     }
@@ -71,6 +92,7 @@ class SecurityService {
   // Activity Logging
   async logActivity(action, email, description, metadata = {}) {
     try {
+      console.log('Logging activity:', { action, email, description });
       const logEntry = {
         action,
         email,
@@ -82,7 +104,9 @@ class SecurityService {
         ...metadata
       };
 
-      await addDoc(collection(db, 'admin_activity_logs'), logEntry);
+      console.log('Log entry to be saved:', logEntry);
+      const docRef = await addDoc(collection(db, 'admin_activity_logs'), logEntry);
+      console.log('Activity logged successfully with ID:', docRef.id);
       
       // Keep local copy for immediate access
       this.activityLogs.push({
@@ -101,6 +125,7 @@ class SecurityService {
 
   async getRecentActivity(email, limit = 50) {
     try {
+      console.log('Getting recent activity for email:', email, 'with limit:', limit);
       const q = query(
         collection(db, 'admin_activity_logs'),
         where('email', '==', email),
@@ -109,10 +134,13 @@ class SecurityService {
       );
       
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      console.log('Activity snapshot size:', snapshot.size);
+      const activities = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+      console.log('Activities found:', activities);
+      return activities;
     } catch (error) {
       console.error('Failed to get recent activity:', error);
       return [];
@@ -281,9 +309,15 @@ class SecurityService {
 
   // Utility Functions
   async getClientIP() {
-    // In production, you would get the actual IP from your server
-    // For now, return a placeholder
-    return 'web_client';
+    try {
+      // Try to get IP from a public service
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      // Fallback to a placeholder if IP service fails
+      return 'web_client';
+    }
   }
 
   generateSecureToken() {

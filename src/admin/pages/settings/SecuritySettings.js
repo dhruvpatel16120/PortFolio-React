@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from '../../../firebase/config';
+import { auth, db } from '../../../firebase/config';
+import { doc, updateDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import securityService from '../../services/securityService';
+import { ensureAdminUserExists, getAdminUserData } from '../../utils/adminUserUtils';
 
 const SecuritySettings = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -11,15 +14,33 @@ const SecuritySettings = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [securityStats] = useState({
+  const [activityLoading, setActivityLoading] = useState(true);
+  const [securityStats, setSecurityStats] = useState({
     lastLogin: null,
     failedAttempts: 0,
     loginCount: 0,
-    isOnline: false
+    isOnline: false,
+    lastLoginIP: '',
+    userAgent: ''
   });
 
   useEffect(() => {
     fetchSecurityData();
+    
+    // Log a test activity when visiting security settings
+    const logTestActivity = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await securityService.logActivity('SECURITY_SETTINGS_ACCESSED', user.email, 'User accessed security settings page');
+          console.log('Test activity logged successfully');
+        } catch (error) {
+          console.error('Failed to log test activity:', error);
+        }
+      }
+    };
+    
+    logTestActivity();
   }, []);
 
   useEffect(() => {
@@ -33,13 +54,36 @@ const SecuritySettings = () => {
 
   const fetchSecurityData = async () => {
     try {
+      setActivityLoading(true);
       const user = auth.currentUser;
       if (user) {
+        // Ensure admin user document exists
+        await ensureAdminUserExists(user.email);
+        
+        // Get admin user data
+        const userData = await getAdminUserData(user.email);
+        if (userData) {
+          setSecurityStats({
+            lastLogin: userData.lastLogin || null,
+            failedAttempts: userData.failedAttempts || 0,
+            loginCount: userData.loginCount || 0,
+            isOnline: userData.isOnline || false,
+            lastLoginIP: userData.lastLoginIP || 'Unknown',
+            userAgent: userData.userAgent || 'Unknown'
+          });
+        }
+
+        // Fetch recent activity
+        console.log('Fetching recent activity for:', user.email);
         const activity = await securityService.getRecentActivity(user.email, 10);
+        console.log('Recent activity fetched:', activity);
         setRecentActivity(activity);
       }
     } catch (error) {
       console.error('Failed to fetch security data:', error);
+      setMessage({ type: 'error', text: 'Failed to load security data' });
+    } finally {
+      setActivityLoading(false);
     }
   };
 
@@ -76,11 +120,37 @@ const SecuritySettings = () => {
 
   const handleLogoutAllSessions = async () => {
     try {
-      await securityService.logout();
+      setLoading(true);
+      const user = auth.currentUser;
+      
+      if (user) {
+        // Ensure admin user document exists and update logout status
+        await ensureAdminUserExists(user.email);
+        
+        // Update user status in Firestore
+        await updateDoc(doc(db, 'admin_users', user.email), {
+          isOnline: false,
+          lastLogout: new Date(),
+          sessionEnded: true
+        });
+
+        // Log the logout activity
+        await securityService.logActivity('LOGOUT_ALL_SESSIONS', user.email, 'All sessions logged out by user');
+      }
+
+      // Clear all local storage and session storage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Sign out from Firebase
+      await signOut(auth);
+
+      // Redirect to login page
       window.location.href = '/admin/login';
     } catch (error) {
       console.error('Logout error:', error);
-      setMessage({ type: 'error', text: 'Failed to logout all sessions' });
+      setMessage({ type: 'error', text: 'Failed to logout all sessions: ' + error.message });
+      setLoading(false);
     }
   };
 
@@ -104,6 +174,13 @@ const SecuritySettings = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         );
+      case 'LOGOUT':
+      case 'LOGOUT_ALL_SESSIONS':
+        return (
+          <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        );
       default:
         return (
           <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,6 +194,25 @@ const SecuritySettings = () => {
     if (!timestamp) return 'N/A';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleString();
+  };
+
+  const getActivityDescription = (activity) => {
+    switch (activity.action) {
+      case 'LOGIN_SUCCESS':
+        return 'Successful login';
+      case 'LOGIN_FAILED':
+        return 'Failed login attempt';
+      case 'PASSWORD_CHANGED':
+        return 'Password changed';
+      case 'LOGOUT':
+        return 'User logged out';
+      case 'LOGOUT_ALL_SESSIONS':
+        return 'All sessions logged out';
+      case 'SESSION_TIMEOUT':
+        return 'Session expired';
+      default:
+        return activity.description || 'Activity recorded';
+    }
   };
 
   return (
@@ -288,8 +384,11 @@ const SecuritySettings = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Active since {formatTimestamp(securityStats.lastLogin)}
                   </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    IP: {securityStats.lastLoginIP}
+                  </p>
                 </div>
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className={`w-3 h-3 rounded-full ${securityStats.isOnline ? 'bg-green-500' : 'bg-red-500'}`}></div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -309,9 +408,10 @@ const SecuritySettings = () => {
 
               <button
                 onClick={handleLogoutAllSessions}
-                className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+                disabled={loading}
+                className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
               >
-                Logout All Sessions
+                {loading ? 'Logging Out...' : 'Logout All Sessions'}
               </button>
             </div>
           </div>
@@ -324,16 +424,18 @@ const SecuritySettings = () => {
           </h2>
           
           <div className="space-y-3">
-            {recentActivity.length > 0 ? (
+            {activityLoading ? (
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">Loading recent activity...</p>
+            ) : recentActivity.length > 0 ? (
               recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   {getActivityIcon(activity.action)}
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {activity.description}
+                      {getActivityDescription(activity)}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatTimestamp(activity.timestamp)} • {activity.ipAddress}
+                      {formatTimestamp(activity.timestamp)} • {activity.ipAddress || 'Unknown IP'}
                     </p>
                   </div>
                 </div>

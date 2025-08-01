@@ -1,25 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { HiCog, HiSave, HiRefresh, HiCheckCircle, HiExclamationCircle } from 'react-icons/hi';
+import { HiCog, HiSave, HiRefresh, HiCheckCircle, HiExclamationCircle, HiShieldCheck } from 'react-icons/hi';
+import { auth, db } from '../../../firebase/config';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { ensureAdminUserExists } from '../../utils/adminUserUtils';
 
 const GeneralSettings = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [settings, setSettings] = useState({
+    // Essential Admin Settings
     siteName: 'Portfolio Admin',
-    siteDescription: 'Professional Portfolio Management System',
-    adminEmail: 'admin@portfolio.com',
-    timezone: 'UTC',
-    dateFormat: 'MM/DD/YYYY',
-    timeFormat: '12h',
-    language: 'en',
+    adminEmail: '',
     maintenanceMode: false,
-    debugMode: false,
-    autoBackup: true,
-    backupFrequency: 'daily',
+    sessionTimeout: 30,
     maxUploadSize: 10,
     allowedFileTypes: ['jpg', 'png', 'pdf', 'doc'],
-    sessionTimeout: 30,
-    paginationLimit: 20
+    
+    // Firebase Integration Settings
+    enableFirebaseAnalytics: true,
+    enableErrorReporting: true,
+    enablePerformanceMonitoring: true,
+    
+    // Security Settings
+    requirePasswordChange: false,
+    enableLoginNotifications: true,
+    maxLoginAttempts: 5,
+    lockoutDuration: 15,
+    
+    // Content Management
+    autoSaveInterval: 30,
+    enableDraftMode: true,
+    enableVersionControl: false
   });
 
   const [originalSettings, setOriginalSettings] = useState({});
@@ -27,24 +38,62 @@ const GeneralSettings = () => {
   const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
-      // Simulate API call to load settings
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // In a real app, this would come from your backend
-      const savedSettings = localStorage.getItem('adminGeneralSettings');
-      if (savedSettings) {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(parsed);
-        setOriginalSettings(parsed);
+      // Get current user
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('No authenticated user. Please log in again.');
+      }
+
+      // Ensure admin user document exists
+      await ensureAdminUserExists(user.email);
+
+      // Load settings from Firestore
+      const settingsDoc = await getDoc(doc(db, 'admin_settings', 'general'));
+      
+      if (settingsDoc.exists()) {
+        const savedSettings = settingsDoc.data();
+        const mergedSettings = {
+          ...settings,
+          ...savedSettings,
+          adminEmail: user.email // Always use current user's email
+        };
+        setSettings(mergedSettings);
+        setOriginalSettings(mergedSettings);
       } else {
-        setOriginalSettings(settings);
+        // Create default settings
+        const defaultSettings = {
+          ...settings,
+          adminEmail: user.email
+        };
+        setSettings(defaultSettings);
+        setOriginalSettings(defaultSettings);
+        
+        // Save default settings to Firestore
+        try {
+          await setDoc(doc(db, 'admin_settings', 'general'), defaultSettings);
+        } catch (error) {
+          console.error('Failed to create default settings:', error);
+          // Don't throw error here, just use default settings
+        }
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load settings' });
+      console.error('Failed to load settings:', error);
+      let errorMessage = 'Failed to load settings';
+      
+      if (error.code === 'permission-denied') {
+        errorMessage = 'Permission denied. Please check your Firestore security rules.';
+      } else if (error.message.includes('No authenticated user')) {
+        errorMessage = 'Please log in again to access settings.';
+      } else {
+        errorMessage = error.message;
+      }
+      
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setLoading(false);
     }
-  }, [settings]);
+  }, []);
 
   useEffect(() => {
     loadSettings();
@@ -63,16 +112,46 @@ const GeneralSettings = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      // Simulate API call to save settings
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Save to localStorage for demo purposes
-      localStorage.setItem('adminGeneralSettings', JSON.stringify(settings));
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('No authenticated user. Please log in again.');
+      }
+
+      // Validate settings
+      if (settings.sessionTimeout < 5 || settings.sessionTimeout > 480) {
+        throw new Error('Session timeout must be between 5 and 480 minutes');
+      }
+
+      if (settings.maxUploadSize < 1 || settings.maxUploadSize > 100) {
+        throw new Error('Max upload size must be between 1 and 100 MB');
+      }
+
+      if (settings.maxLoginAttempts < 1 || settings.maxLoginAttempts > 10) {
+        throw new Error('Max login attempts must be between 1 and 10');
+      }
+
+      // Save to Firestore
+      await updateDoc(doc(db, 'admin_settings', 'general'), {
+        ...settings,
+        lastUpdated: new Date(),
+        updatedBy: user.email
+      });
+
       setOriginalSettings(settings);
-      
       setMessage({ type: 'success', text: 'Settings saved successfully!' });
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save settings' });
+      console.error('Failed to save settings:', error);
+      let errorMessage = 'Failed to save settings';
+      
+      if (error.code === 'permission-denied') {
+        errorMessage = 'Permission denied. Please check your Firestore security rules. Make sure you have write access to the admin_settings collection.';
+      } else if (error.message.includes('No authenticated user')) {
+        errorMessage = 'Please log in again to save settings.';
+      } else {
+        errorMessage = error.message;
+      }
+      
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -97,7 +176,7 @@ const GeneralSettings = () => {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">General Settings</h1>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
-            Configure general admin panel settings and preferences
+            Configure essential admin panel settings and Firebase integration
           </p>
         </div>
 
@@ -116,9 +195,12 @@ const GeneralSettings = () => {
         )}
 
         <form onSubmit={handleSave} className="space-y-8">
-          {/* Site Information */}
+          {/* Basic Admin Settings */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Site Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <HiCog className="w-5 h-5 mr-2" />
+              Basic Admin Settings
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -134,107 +216,33 @@ const GeneralSettings = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Site Description
-                </label>
-                <input
-                  type="text"
-                  value={settings.siteDescription}
-                  onChange={(e) => handleInputChange('siteDescription', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Enter site description"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Admin Email
                 </label>
                 <input
                   type="email"
                   value={settings.adminEmail}
-                  onChange={(e) => handleInputChange('adminEmail', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
                   placeholder="admin@example.com"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Timezone
-                </label>
-                <select
-                  value={settings.timezone}
-                  onChange={(e) => handleInputChange('timezone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="UTC">UTC</option>
-                  <option value="America/New_York">Eastern Time</option>
-                  <option value="America/Chicago">Central Time</option>
-                  <option value="America/Denver">Mountain Time</option>
-                  <option value="America/Los_Angeles">Pacific Time</option>
-                  <option value="Europe/London">London</option>
-                  <option value="Europe/Paris">Paris</option>
-                  <option value="Asia/Tokyo">Tokyo</option>
-                </select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Email is managed by Firebase Authentication
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Display Settings */}
+          {/* Security Settings */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Display Settings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Date Format
-                </label>
-                <select
-                  value={settings.dateFormat}
-                  onChange={(e) => handleInputChange('dateFormat', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Time Format
-                </label>
-                <select
-                  value={settings.timeFormat}
-                  onChange={(e) => handleInputChange('timeFormat', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="12h">12-hour</option>
-                  <option value="24h">24-hour</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Language
-                </label>
-                <select
-                  value={settings.language}
-                  onChange={(e) => handleInputChange('language', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="de">German</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* System Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">System Settings</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <HiShieldCheck className="w-5 h-5 mr-2" />
+              Security Settings
+            </h2>
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white">Maintenance Mode</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Enable maintenance mode to restrict access</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Restrict access to admin panel</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -246,56 +254,65 @@ const GeneralSettings = () => {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 </label>
               </div>
-              
-              <div className="flex items-center justify-between">
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Debug Mode</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Enable debug logging for development</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Session Timeout (minutes)
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={settings.debugMode}
-                    onChange={(e) => handleInputChange('debugMode', e.target.checked)}
-                    className="sr-only peer"
+                    type="number"
+                    min="5"
+                    max="480"
+                    value={settings.sessionTimeout}
+                    onChange={(e) => handleInputChange('sessionTimeout', parseInt(e.target.value))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Max Login Attempts
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={settings.maxLoginAttempts}
+                    onChange={(e) => handleInputChange('maxLoginAttempts', parseInt(e.target.value))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Lockout Duration (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    min="5"
+                    max="60"
+                    value={settings.lockoutDuration}
+                    onChange={(e) => handleInputChange('lockoutDuration', parseInt(e.target.value))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Auto Backup</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Automatically backup data</p>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Enable Login Notifications</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Get notified of login attempts</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={settings.autoBackup}
-                    onChange={(e) => handleInputChange('autoBackup', e.target.checked)}
+                    checked={settings.enableLoginNotifications}
+                    onChange={(e) => handleInputChange('enableLoginNotifications', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 </label>
               </div>
             </div>
-
-            {settings.autoBackup && (
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Backup Frequency
-                </label>
-                <select
-                  value={settings.backupFrequency}
-                  onChange={(e) => handleInputChange('backupFrequency', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
-            )}
           </div>
 
           {/* File Upload Settings */}
@@ -317,16 +334,70 @@ const GeneralSettings = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Session Timeout (minutes)
+                  Auto Save Interval (seconds)
                 </label>
                 <input
                   type="number"
-                  min="5"
-                  max="480"
-                  value={settings.sessionTimeout}
-                  onChange={(e) => handleInputChange('sessionTimeout', parseInt(e.target.value))}
+                  min="10"
+                  max="300"
+                  value={settings.autoSaveInterval}
+                  onChange={(e) => handleInputChange('autoSaveInterval', parseInt(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Firebase Integration */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Firebase Integration</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Enable Analytics</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Track admin panel usage</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.enableFirebaseAnalytics}
+                    onChange={(e) => handleInputChange('enableFirebaseAnalytics', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Enable Error Reporting</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Report errors to Firebase</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.enableErrorReporting}
+                    onChange={(e) => handleInputChange('enableErrorReporting', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Enable Performance Monitoring</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Monitor admin panel performance</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.enablePerformanceMonitoring}
+                    onChange={(e) => handleInputChange('enablePerformanceMonitoring', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
               </div>
             </div>
           </div>
@@ -361,4 +432,4 @@ const GeneralSettings = () => {
   );
 };
 
-export default GeneralSettings; 
+export default GeneralSettings;

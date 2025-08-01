@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../firebase/config';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, updateDoc, increment, addDoc, collection } from 'firebase/firestore';
@@ -19,9 +19,34 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          // Check if user exists in admin collection
+          const adminDoc = await getDoc(doc(db, 'admin_users', user.uid));
+          if (adminDoc.exists() && adminDoc.data().isActive) {
+            setIsAuthenticated(true);
+            // Redirect to intended page or dashboard
+            const from = location.state?.from?.pathname || '/admin';
+            navigate(from, { replace: true });
+            return;
+          }
+        } catch (error) {
+          console.warn('Error checking admin status:', error);
+        }
+      }
+      setIsAuthenticated(false);
+    });
+
+    return () => unsubscribe();
+  }, [navigate, location]);
 
   // Check for lockout on component mount
   useEffect(() => {
@@ -77,48 +102,64 @@ const AdminLogin = () => {
       // First attempt Firebase authentication
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      // Check if user exists in admin collection using UID
-      const adminDoc = await getDoc(doc(db, 'admin_users', userCredential.user.uid));
-      if (!adminDoc.exists()) {
-        // Sign out the user since they don't have admin privileges
+      try {
+        // Check if user exists in admin collection using UID
+        const adminDoc = await getDoc(doc(db, 'admin_users', userCredential.user.uid));
+        if (!adminDoc.exists()) {
+          // Sign out the user since they don't have admin privileges
+          await signOut(auth);
+          throw new Error('Access denied. Admin privileges required.');
+        }
+
+        const adminData = adminDoc.data();
+        if (!adminData.isActive) {
+          // Sign out the user since their account is deactivated
+          await signOut(auth);
+          throw new Error('Account is deactivated. Contact administrator.');
+        }
+        
+        // Update last login time and login count
+        try {
+          await updateDoc(doc(db, 'admin_users', userCredential.user.uid), {
+            lastLogin: new Date(),
+            loginCount: increment(1),
+            lastLoginIP: 'web', // In production, get actual IP
+            isOnline: true
+          });
+        } catch (updateError) {
+          console.warn('Failed to update admin user data:', updateError);
+          // Don't fail the login for this error
+        }
+
+        // Log successful login (don't fail if this fails)
+        try {
+          await logActivity('LOGIN_SUCCESS', email, 'Successful login');
+        } catch (logError) {
+          console.warn('Failed to log activity:', logError);
+        }
+
+        // Handle remember me
+        if (rememberMe) {
+          localStorage.setItem('rememberedAdmin', JSON.stringify({ email }));
+        } else {
+          localStorage.removeItem('rememberedAdmin');
+        }
+
+        // Reset login attempts
+        setLoginAttempts(0);
+        localStorage.removeItem('adminLockout');
+
+        setSuccess('Login successful! Redirecting...');
+        
+        // Redirect to intended page or dashboard
+        const from = location.state?.from?.pathname || '/admin';
+        setTimeout(() => navigate(from, { replace: true }), 1000);
+
+      } catch (adminError) {
+        // If admin check fails, sign out and throw the error
         await signOut(auth);
-        throw new Error('Access denied. Admin privileges required.');
+        throw adminError;
       }
-
-      const adminData = adminDoc.data();
-      if (!adminData.isActive) {
-        // Sign out the user since their account is deactivated
-        await signOut(auth);
-        throw new Error('Account is deactivated. Contact administrator.');
-      }
-      
-      // Update last login time and login count
-      await updateDoc(doc(db, 'admin_users', userCredential.user.uid), {
-        lastLogin: new Date(),
-        loginCount: increment(1),
-        lastLoginIP: 'web', // In production, get actual IP
-        isOnline: true
-      });
-
-      // Log successful login
-      await logActivity('LOGIN_SUCCESS', email, 'Successful login');
-
-      // Handle remember me
-      if (rememberMe) {
-        localStorage.setItem('rememberedAdmin', JSON.stringify({ email }));
-      } else {
-        localStorage.removeItem('rememberedAdmin');
-      }
-
-      // Reset login attempts
-      setLoginAttempts(0);
-      localStorage.removeItem('adminLockout');
-
-      setSuccess('Login successful! Redirecting...');
-      
-      // Redirect to intended page or dashboard
-      const from = location.state?.from?.pathname || '/admin';
-      setTimeout(() => navigate(from, { replace: true }), 1000);
 
     } catch (error) {
       console.error('Login error:', error);
@@ -127,8 +168,12 @@ const AdminLogin = () => {
       const newAttempts = loginAttempts + 1;
       setLoginAttempts(newAttempts);
       
-      // Log failed attempt
-      await logActivity('LOGIN_FAILED', email, `Failed login attempt ${newAttempts}`);
+      // Log failed attempt (don't fail if this fails)
+      try {
+        await logActivity('LOGIN_FAILED', email, `Failed login attempt ${newAttempts}`);
+      } catch (logError) {
+        console.warn('Failed to log failed login attempt:', logError);
+      }
 
       // Use the authentication error handler
       const errorResult = authErrorHandler.handleAuthError(error, {
@@ -233,7 +278,7 @@ const AdminLogin = () => {
     }
   }, [isLocked, lockoutTime]);
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

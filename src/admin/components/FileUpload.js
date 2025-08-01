@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { cloudinaryService } from '../services/fileUploadService';
+import fileUploadService from '../../services/fileUploadService';
+import { useSettings } from '../../context/SettingsContext';
 import { toast } from 'react-toastify';
 
 const FileUpload = ({ 
@@ -10,6 +12,7 @@ const FileUpload = ({
   allowedTypes = ['image', 'video'],
   className = ''
 }) => {
+  const { settings } = useSettings();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -29,7 +32,24 @@ const FileUpload = ({
         throw new Error(`Maximum ${maxFiles} files allowed`);
       }
 
-      // Validate file types
+      // Validate files using settings
+      const validationResults = fileUploadService.validateFiles(fileArray, settings);
+      const invalidFiles = validationResults.filter(result => !result.valid);
+      
+      if (invalidFiles.length > 0) {
+        const errorMessages = invalidFiles.map(result => 
+          `${result.file.name}: ${result.error}`
+        ).join(', ');
+        throw new Error(errorMessages);
+      }
+
+      // Check total file size
+      const totalSizeCheck = fileUploadService.checkTotalSize(fileArray, settings);
+      if (!totalSizeCheck.valid) {
+        throw new Error(totalSizeCheck.error);
+      }
+
+      // Validate file types for Cloudinary
       const validFiles = fileArray.filter(file => {
         const isImage = cloudinaryService.isImageFile(file);
         const isVideo = cloudinaryService.isVideoFile(file);
@@ -62,7 +82,7 @@ const FileUpload = ({
       setIsUploading(false);
       setUploadProgress(0);
     }
-  }, [maxFiles, allowedTypes, folder, onUploadSuccess, onUploadError]);
+  }, [maxFiles, allowedTypes, folder, onUploadSuccess, onUploadError, settings]);
 
   // Handle drag and drop
   const handleDragOver = useCallback((e) => {
@@ -87,6 +107,9 @@ const FileUpload = ({
     const files = e.target.files;
     handleFileSelect(files);
   }, [handleFileSelect]);
+
+  // Get max upload size for display
+  const maxUploadSize = settings ? settings.maxUploadSize : 10;
 
   return (
     <div className={`file-upload ${className}`}>
@@ -124,6 +147,7 @@ const FileUpload = ({
             <div className="file-types">
               <span>Supported: {allowedTypes.join(', ')}</span>
               <span>Max: {maxFiles} files</span>
+              <span>Size: {maxUploadSize}MB per file</span>
             </div>
             <input
               type="file"
@@ -209,6 +233,8 @@ const FileUpload = ({
           gap: 1rem;
           font-size: 0.75rem;
           color: #9ca3af;
+          flex-wrap: wrap;
+          justify-content: center;
         }
 
         .file-input {

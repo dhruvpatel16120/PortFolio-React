@@ -77,7 +77,7 @@ const SiteConfiguration = () => {
     } finally {
       setLoading(false);
     }
-  }, [config]);
+  }, []);
 
   useEffect(() => {
     loadConfiguration();

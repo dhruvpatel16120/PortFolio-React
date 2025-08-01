@@ -1,6 +1,8 @@
 // src/App.js
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, UNSAFE_future } from 'react-router-dom';
+import SettingsProvider from './context/SettingsContext';
+import { useSettings } from './context/SettingsContext';
 
 // Components
 import Navbar from './components/Navbar';
@@ -26,35 +28,67 @@ const PageLoader = () => (
   </div>
 );
 
+// Maintenance Mode Component
+const MaintenanceMode = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-lightBgFrom via-lightBgVia to-lightBgTo dark:from-darkBgFrom dark:via-darkBgVia dark:to-darkBgTo">
+    <div className="text-center p-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-2xl">
+      <div className="text-6xl mb-4">🔧</div>
+      <h1 className="text-3xl font-bold text-lightText dark:text-darkText mb-4">
+        Under Maintenance
+      </h1>
+      <p className="text-lg text-lightText/80 dark:text-darkText/80 mb-6">
+        We're currently performing some maintenance on our site. We'll be back shortly!
+      </p>
+      <div className="text-sm text-lightText/60 dark:text-darkText/60">
+        Thank you for your patience.
+      </div>
+    </div>
+  </div>
+);
+
+// Public Routes Component
+const PublicRoutes = () => {
+  const { isMaintenanceMode, settings } = useSettings();
+
+  // Show maintenance mode if enabled
+  if (isMaintenanceMode()) {
+    return <MaintenanceMode />;
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/resume" element={<Resume />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
 export default function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <Routes>
-          {/* Admin Routes - No Navbar/Footer */}
-          <Route path="/admin/*" element={<AdminApp />} />
-          
-          {/* Public Routes - With Navbar/Footer */}
-          <Route path="/*" element={
-            <div className="flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-grow">
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/projects" element={<Projects />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/resume" element={<Resume />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </main>
-              <Footer />
-            </div>
-          } />
-        </Routes>
-      </Router>
+      <SettingsProvider>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            {/* Admin Routes - No Navbar/Footer */}
+            <Route path="/admin/*" element={<AdminApp />} />
+            
+            {/* Public Routes - With Navbar/Footer */}
+            <Route path="/*" element={<PublicRoutes />} />
+          </Routes>
+        </Router>
+      </SettingsProvider>
     </ErrorBoundary>
   );
 }
