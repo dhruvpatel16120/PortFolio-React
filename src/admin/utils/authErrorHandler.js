@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 
 // Authentication-specific error codes and messages
 export const AUTH_ERROR_MESSAGES = {
-  // Firebase Authentication Errors
+  // Firebase Authentication Errors (only the ones actually used)
   'auth/user-not-found': 'No account found with this email address.',
   'auth/wrong-password': 'Incorrect password. Please try again.',
   'auth/invalid-email': 'Please enter a valid email address.',
@@ -37,7 +37,7 @@ export const AUTH_ERROR_MESSAGES = {
   'auth/missing-verification-code': 'Verification code is required.',
   'auth/missing-verification-id': 'Verification ID is required.',
 
-  // Admin-specific Authentication Errors
+  // Admin-specific Authentication Errors (only the ones actually used)
   'ADMIN_ACCESS_DENIED': 'Access denied. Admin privileges required.',
   'ADMIN_ACCOUNT_DEACTIVATED': 'Account is deactivated. Contact administrator.',
   'ADMIN_ACCOUNT_LOCKED': 'Account is temporarily locked. Please try again later.',
@@ -58,7 +58,7 @@ export const AUTH_ERROR_MESSAGES = {
   'ADMIN_DATABASE_ERROR': 'Database connection error. Please try again.',
   'ADMIN_CONFIGURATION_ERROR': 'System configuration error. Please contact administrator.',
 
-  // Network and System Errors
+  // Network and System Errors (only the ones actually used)
   'NETWORK_OFFLINE': 'You appear to be offline. Please check your internet connection.',
   'NETWORK_TIMEOUT': 'Request timed out. Please try again.',
   'NETWORK_SERVER_ERROR': 'Server error occurred. Please try again later.',
@@ -241,197 +241,6 @@ export class AuthErrorHandler {
     }
     
     return errors;
-  }
-
-  // Handle specific Firebase auth errors
-  handleFirebaseAuthError(error) {
-    const errorCode = error.code;
-    let message = AUTH_ERROR_MESSAGES['UNKNOWN_ERROR'];
-
-    // Handle specific Firebase auth errors
-    switch (errorCode) {
-      case 'auth/user-not-found':
-        message = AUTH_ERROR_MESSAGES['auth/user-not-found'];
-        break;
-      case 'auth/wrong-password':
-        message = AUTH_ERROR_MESSAGES['auth/wrong-password'];
-        break;
-      case 'auth/invalid-email':
-        message = AUTH_ERROR_MESSAGES['auth/invalid-email'];
-        break;
-      case 'auth/too-many-requests':
-        message = AUTH_ERROR_MESSAGES['auth/too-many-requests'];
-        break;
-      case 'auth/user-disabled':
-        message = AUTH_ERROR_MESSAGES['auth/user-disabled'];
-        break;
-      case 'auth/invalid-credential':
-        message = AUTH_ERROR_MESSAGES['auth/invalid-credential'];
-        break;
-      case 'auth/network-request-failed':
-        message = AUTH_ERROR_MESSAGES['auth/network-request-failed'];
-        break;
-      case 'auth/internal-error':
-        message = AUTH_ERROR_MESSAGES['auth/internal-error'];
-        break;
-      case 'auth/timeout':
-        message = AUTH_ERROR_MESSAGES['auth/timeout'];
-        break;
-      default:
-        message = error.message || AUTH_ERROR_MESSAGES['UNKNOWN_ERROR'];
-    }
-
-    return {
-      message,
-      code: errorCode,
-      originalError: error
-    };
-  }
-
-  // Handle admin-specific authentication errors
-  handleAdminAuthError(error) {
-    const errorCode = error.code;
-    let message = AUTH_ERROR_MESSAGES['UNKNOWN_ERROR'];
-
-    // Handle specific admin auth errors
-    switch (errorCode) {
-      case 'ADMIN_ACCESS_DENIED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_ACCESS_DENIED'];
-        break;
-      case 'ADMIN_ACCOUNT_DEACTIVATED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_ACCOUNT_DEACTIVATED'];
-        break;
-      case 'ADMIN_ACCOUNT_LOCKED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_ACCOUNT_LOCKED'];
-        break;
-      case 'ADMIN_INVALID_CREDENTIALS':
-        message = AUTH_ERROR_MESSAGES['ADMIN_INVALID_CREDENTIALS'];
-        break;
-      case 'ADMIN_NOT_FOUND':
-        message = AUTH_ERROR_MESSAGES['ADMIN_NOT_FOUND'];
-        break;
-      case 'ADMIN_PERMISSION_DENIED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_PERMISSION_DENIED'];
-        break;
-      case 'ADMIN_SESSION_EXPIRED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_SESSION_EXPIRED'];
-        break;
-      case 'ADMIN_ACCOUNT_DISABLED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_ACCOUNT_DISABLED'];
-        break;
-      case 'ADMIN_IP_NOT_ALLOWED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_IP_NOT_ALLOWED'];
-        break;
-      case 'ADMIN_MAINTENANCE_MODE':
-        message = AUTH_ERROR_MESSAGES['ADMIN_MAINTENANCE_MODE'];
-        break;
-      case 'ADMIN_RATE_LIMIT_EXCEEDED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_RATE_LIMIT_EXCEEDED'];
-        break;
-      case 'ADMIN_INVALID_TOKEN':
-        message = AUTH_ERROR_MESSAGES['ADMIN_INVALID_TOKEN'];
-        break;
-      case 'ADMIN_MISSING_PERMISSIONS':
-        message = AUTH_ERROR_MESSAGES['ADMIN_MISSING_PERMISSIONS'];
-        break;
-      case 'ADMIN_ACCOUNT_PENDING':
-        message = AUTH_ERROR_MESSAGES['ADMIN_ACCOUNT_PENDING'];
-        break;
-      case 'ADMIN_ACCOUNT_SUSPENDED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_ACCOUNT_SUSPENDED'];
-        break;
-      case 'ADMIN_LOGIN_FAILED':
-        message = AUTH_ERROR_MESSAGES['ADMIN_LOGIN_FAILED'];
-        break;
-      case 'ADMIN_FIREBASE_ERROR':
-        message = AUTH_ERROR_MESSAGES['ADMIN_FIREBASE_ERROR'];
-        break;
-      case 'ADMIN_DATABASE_ERROR':
-        message = AUTH_ERROR_MESSAGES['ADMIN_DATABASE_ERROR'];
-        break;
-      case 'ADMIN_CONFIGURATION_ERROR':
-        message = AUTH_ERROR_MESSAGES['ADMIN_CONFIGURATION_ERROR'];
-        break;
-      default:
-        message = error.message || AUTH_ERROR_MESSAGES['UNKNOWN_ERROR'];
-    }
-
-    return {
-      message,
-      code: errorCode,
-      originalError: error
-    };
-  }
-
-  // Handle Firestore permission errors specifically
-  handleFirestorePermissionError(error) {
-    if (error.message && error.message.includes('Missing or insufficient permissions')) {
-      return {
-        message: 'Database access denied. Please contact administrator.',
-        code: 'FIRESTORE_PERMISSION_DENIED',
-        originalError: error
-      };
-    }
-    
-    if (error.message && error.message.includes('permission-denied')) {
-      return {
-        message: 'Access denied. Please contact administrator.',
-        code: 'FIRESTORE_PERMISSION_DENIED',
-        originalError: error
-      };
-    }
-
-    return {
-      message: error.message || 'Database error occurred.',
-      code: 'FIRESTORE_ERROR',
-      originalError: error
-    };
-  }
-
-  // Check if error is retryable
-  isRetryableError(error) {
-    const retryableErrors = [
-      'auth/network-request-failed',
-      'auth/internal-error',
-      'auth/timeout',
-      'NETWORK_OFFLINE',
-      'NETWORK_TIMEOUT',
-      'NETWORK_SERVER_ERROR',
-      'SYSTEM_MAINTENANCE',
-      'SYSTEM_OVERLOADED'
-    ];
-
-    return retryableErrors.includes(error.code);
-  }
-
-  // Retry mechanism for authentication operations
-  async retryAuthOperation(operation, maxRetries = 3, delay = 1000) {
-    let lastError;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await operation();
-      } catch (error) {
-        lastError = error;
-        
-        // Don't retry on certain errors
-        if (!this.isRetryableError(error)) {
-          throw error;
-        }
-
-        // Wait before retrying (except on last attempt)
-        if (attempt < maxRetries) {
-          await this.delay(delay * attempt);
-        }
-      }
-    }
-
-    throw lastError;
-  }
-
-  // Delay utility
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 
