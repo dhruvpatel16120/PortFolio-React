@@ -452,6 +452,7 @@ const calculateAnalytics = (submissions) => {
   const newCount = submissions.filter(s => s.status === 'new').length;
   const readCount = submissions.filter(s => s.status === 'read').length;
   const repliedCount = submissions.filter(s => s.status === 'replied').length;
+  const archivedCount = submissions.filter(s => s.status === 'archived').length;
   
   // Device breakdown
   const deviceCounts = {};
@@ -482,9 +483,53 @@ const calculateAnalytics = (submissions) => {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
+  // Status breakdown
+  const statusBreakdown = [
+    { status: 'new', count: newCount, percentage: total > 0 ? Math.round((newCount / total) * 100) : 0, color: 'blue' },
+    { status: 'read', count: readCount, percentage: total > 0 ? Math.round((readCount / total) * 100) : 0, color: 'yellow' },
+    { status: 'replied', count: repliedCount, percentage: total > 0 ? Math.round((repliedCount / total) * 100) : 0, color: 'green' },
+    { status: 'archived', count: archivedCount, percentage: total > 0 ? Math.round((archivedCount / total) * 100) : 0, color: 'gray' }
+  ];
+
+  // Response time analysis (mock data for now - in real implementation, calculate from reply timestamps)
+  const responseTimeAnalysis = [
+    { range: '0-1 hour', count: Math.round(total * 0.29), percentage: 29 },
+    { range: '1-4 hours', count: Math.round(total * 0.43), percentage: 43 },
+    { range: '4-24 hours', count: Math.round(total * 0.21), percentage: 21 },
+    { range: '24+ hours', count: Math.round(total * 0.07), percentage: 7 }
+  ];
+
+  // Traffic sources (from referrer data)
+  const referrerCounts = {};
+  submissions.forEach(s => {
+    const referrer = s.metadata?.referrer || 'Direct';
+    let source = 'Direct';
+    if (referrer.includes('google')) source = 'Google';
+    else if (referrer.includes('facebook') || referrer.includes('twitter') || referrer.includes('instagram')) source = 'Social Media';
+    else if (referrer.includes('mail') || referrer.includes('email')) source = 'Email';
+    else if (referrer !== 'Direct') source = 'Other';
+    
+    referrerCounts[source] = (referrerCounts[source] || 0) + 1;
+  });
+
+  const topReferrers = Object.entries(referrerCounts)
+    .map(([source, count]) => ({
+      source,
+      count,
+      percentage: Math.round((count / total) * 100)
+    }))
+    .sort((a, b) => b.count - a.count);
+
   // Calculate average response time (mock data for now)
   const avgResponseTime = '2.3 hours';
   const conversionRate = total > 0 ? Math.round((repliedCount / total) * 100) + '%' : '0%';
+
+  // Generate trends data (mock data for now - in real implementation, calculate from daily/weekly/monthly data)
+  const trends = {
+    daily: Array.from({ length: 30 }, () => Math.floor(Math.random() * 20) + 10),
+    weekly: Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 70),
+    monthly: Array.from({ length: 6 }, () => Math.floor(Math.random() * 100) + 300)
+  };
 
   return {
     overview: {
@@ -496,7 +541,11 @@ const calculateAnalytics = (submissions) => {
       conversionRate
     },
     devices,
-    locations
+    locations,
+    statusBreakdown,
+    responseTimeAnalysis,
+    topReferrers,
+    trends
   };
 };
 

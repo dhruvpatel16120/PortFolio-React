@@ -17,60 +17,60 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { getContactAnalytics } from '../../../firebase/contactService';
 
+// Mock analytics data - moved outside component to avoid dependency issues
+const mockAnalytics = {
+  overview: {
+    totalSubmissions: 156,
+    newSubmissions: 23,
+    repliedSubmissions: 89,
+    avgResponseTime: '2.3 hours',
+    conversionRate: '68%'
+  },
+  devices: [
+    { type: 'desktop', count: 89, percentage: 57 },
+    { type: 'mobile', count: 52, percentage: 33 },
+    { type: 'tablet', count: 15, percentage: 10 }
+  ],
+  locations: [
+    { country: 'United States', count: 45, percentage: 29 },
+    { country: 'India', count: 32, percentage: 21 },
+    { country: 'United Kingdom', count: 28, percentage: 18 },
+    { country: 'Canada', count: 18, percentage: 12 },
+    { country: 'Australia', count: 15, percentage: 10 },
+    { country: 'Others', count: 18, percentage: 12 }
+  ],
+  // New analytics data
+  statusBreakdown: [
+    { status: 'new', count: 23, percentage: 15, color: 'blue' },
+    { status: 'read', count: 34, percentage: 22, color: 'yellow' },
+    { status: 'replied', count: 89, percentage: 57, color: 'green' },
+    { status: 'archived', count: 10, percentage: 6, color: 'gray' }
+  ],
+  responseTimeAnalysis: [
+    { range: '0-1 hour', count: 45, percentage: 29 },
+    { range: '1-4 hours', count: 67, percentage: 43 },
+    { range: '4-24 hours', count: 32, percentage: 21 },
+    { range: '24+ hours', count: 12, percentage: 7 }
+  ],
+  trends: {
+    daily: [12, 15, 8, 20, 18, 25, 22, 19, 16, 14, 21, 24, 18, 15, 12, 20, 23, 19, 17, 14, 16, 18, 22, 25, 21, 19, 16, 14, 18, 20],
+    weekly: [85, 92, 78, 105, 98, 112, 95],
+    monthly: [320, 385, 420, 398, 456, 432]
+  },
+  topReferrers: [
+    { source: 'Direct', count: 45, percentage: 29 },
+    { source: 'Google', count: 38, percentage: 24 },
+    { source: 'Social Media', count: 32, percentage: 21 },
+    { source: 'Email', count: 25, percentage: 16 },
+    { source: 'Other', count: 16, percentage: 10 }
+  ]
+};
+
 const ContactAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [timePeriod, setTimePeriod] = useState('30d');
   const [refreshing, setRefreshing] = useState(false);
-
-  // Mock analytics data
-  const mockAnalytics = {
-    overview: {
-      totalSubmissions: 156,
-      newSubmissions: 23,
-      repliedSubmissions: 89,
-      avgResponseTime: '2.3 hours',
-      conversionRate: '68%'
-    },
-    devices: [
-      { type: 'desktop', count: 89, percentage: 57 },
-      { type: 'mobile', count: 52, percentage: 33 },
-      { type: 'tablet', count: 15, percentage: 10 }
-    ],
-    locations: [
-      { country: 'United States', count: 45, percentage: 29 },
-      { country: 'India', count: 32, percentage: 21 },
-      { country: 'United Kingdom', count: 28, percentage: 18 },
-      { country: 'Canada', count: 18, percentage: 12 },
-      { country: 'Australia', count: 15, percentage: 10 },
-      { country: 'Others', count: 18, percentage: 12 }
-    ],
-    // New analytics data
-    statusBreakdown: [
-      { status: 'new', count: 23, percentage: 15, color: 'blue' },
-      { status: 'read', count: 34, percentage: 22, color: 'yellow' },
-      { status: 'replied', count: 89, percentage: 57, color: 'green' },
-      { status: 'archived', count: 10, percentage: 6, color: 'gray' }
-    ],
-    responseTimeAnalysis: [
-      { range: '0-1 hour', count: 45, percentage: 29 },
-      { range: '1-4 hours', count: 67, percentage: 43 },
-      { range: '4-24 hours', count: 32, percentage: 21 },
-      { range: '24+ hours', count: 12, percentage: 7 }
-    ],
-    trends: {
-      daily: [12, 15, 8, 20, 18, 25, 22, 19, 16, 14, 21, 24, 18, 15, 12, 20, 23, 19, 17, 14, 16, 18, 22, 25, 21, 19, 16, 14, 18, 20],
-      weekly: [85, 92, 78, 105, 98, 112, 95],
-      monthly: [320, 385, 420, 398, 456, 432]
-    },
-    topReferrers: [
-      { source: 'Direct', count: 45, percentage: 29 },
-      { source: 'Google', count: 38, percentage: 24 },
-      { source: 'Social Media', count: 32, percentage: 21 },
-      { source: 'Email', count: 25, percentage: 16 },
-      { source: 'Other', count: 16, percentage: 10 }
-    ]
-  };
 
   useEffect(() => {
     const loadAnalytics = async () => {
@@ -78,7 +78,19 @@ const ContactAnalytics = () => {
         setLoading(true);
         const result = await getContactAnalytics(timePeriod);
         if (result.success && result.data) {
-          setAnalytics(result.data);
+          // Merge with mock data to ensure all required properties exist
+          setAnalytics({
+            ...mockAnalytics,
+            ...result.data,
+            // Ensure nested objects are properly merged
+            overview: { ...mockAnalytics.overview, ...result.data.overview },
+            devices: result.data.devices || mockAnalytics.devices,
+            locations: result.data.locations || mockAnalytics.locations,
+            statusBreakdown: result.data.statusBreakdown || mockAnalytics.statusBreakdown,
+            responseTimeAnalysis: result.data.responseTimeAnalysis || mockAnalytics.responseTimeAnalysis,
+            topReferrers: result.data.topReferrers || mockAnalytics.topReferrers,
+            trends: { ...mockAnalytics.trends, ...result.data.trends }
+          });
         } else {
           toast.error('Failed to load analytics: ' + (result.error || 'Unknown error'));
           // Fallback to mock data
@@ -101,8 +113,20 @@ const ContactAnalytics = () => {
     setRefreshing(true);
     try {
       const result = await getContactAnalytics(timePeriod);
-      if (result.success) {
-        setAnalytics(result.data);
+      if (result.success && result.data) {
+        // Merge with mock data to ensure all required properties exist
+        setAnalytics({
+          ...mockAnalytics,
+          ...result.data,
+          // Ensure nested objects are properly merged
+          overview: { ...mockAnalytics.overview, ...result.data.overview },
+          devices: result.data.devices || mockAnalytics.devices,
+          locations: result.data.locations || mockAnalytics.locations,
+          statusBreakdown: result.data.statusBreakdown || mockAnalytics.statusBreakdown,
+          responseTimeAnalysis: result.data.responseTimeAnalysis || mockAnalytics.responseTimeAnalysis,
+          topReferrers: result.data.topReferrers || mockAnalytics.topReferrers,
+          trends: { ...mockAnalytics.trends, ...result.data.trends }
+        });
         toast.success('Analytics refreshed successfully');
       } else {
         toast.error('Failed to refresh analytics');
@@ -209,11 +233,11 @@ const ContactAnalytics = () => {
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total</p>
                   <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    {analytics.overview.totalSubmissions}
+                    {analytics.overview?.totalSubmissions || 0}
                   </p>
                 </div>
               </div>
-              {getTrendIcon(analytics.overview.totalSubmissions, 140)}
+              {getTrendIcon(analytics.overview?.totalSubmissions || 0, 140)}
             </div>
           </div>
 
@@ -226,11 +250,11 @@ const ContactAnalytics = () => {
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">New</p>
                   <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    {analytics.overview.newSubmissions}
+                    {analytics.overview?.newSubmissions || 0}
                   </p>
                 </div>
               </div>
-              {getTrendIcon(analytics.overview.newSubmissions, 18)}
+              {getTrendIcon(analytics.overview?.newSubmissions || 0, 18)}
             </div>
           </div>
 
@@ -243,7 +267,7 @@ const ContactAnalytics = () => {
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Response Time</p>
                   <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    {analytics.overview.avgResponseTime}
+                    {analytics.overview?.avgResponseTime || 'N/A'}
                   </p>
                 </div>
               </div>
@@ -260,7 +284,7 @@ const ContactAnalytics = () => {
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Conversion</p>
                   <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    {analytics.overview.conversionRate}
+                    {analytics.overview?.conversionRate || 'N/A'}
                   </p>
                 </div>
               </div>
@@ -278,7 +302,7 @@ const ContactAnalytics = () => {
               Submission Status Breakdown
             </h2>
             <div className="space-y-3 sm:space-y-4">
-              {analytics.statusBreakdown?.map((status) => (
+              {(analytics.statusBreakdown || []).map((status) => (
                 <div key={status.status} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                   <div className="flex items-center">
                     <div className={`w-3 h-3 rounded-full ${getStatusColor(status.status)} mr-3`}></div>
@@ -309,7 +333,7 @@ const ContactAnalytics = () => {
               Response Time Analysis
             </h2>
             <div className="space-y-3 sm:space-y-4">
-              {analytics.responseTimeAnalysis?.map((timeRange) => (
+              {(analytics.responseTimeAnalysis || []).map((timeRange) => (
                 <div key={timeRange.range} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                   <div className="flex items-center">
                     <HiClock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 sm:mr-3" />
@@ -341,7 +365,7 @@ const ContactAnalytics = () => {
             Traffic Sources
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {analytics.topReferrers?.map((referrer) => (
+            {(analytics.topReferrers || []).map((referrer) => (
               <div key={referrer.source} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">
@@ -372,7 +396,7 @@ const ContactAnalytics = () => {
               Device Breakdown
             </h2>
             <div className="space-y-3 sm:space-y-4">
-              {analytics.devices.map((device, index) => (
+              {(analytics.devices || []).map((device, index) => (
                 <div key={device.type} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                   <div className="flex items-center">
                     {device.type === 'desktop' ? (
@@ -406,7 +430,7 @@ const ContactAnalytics = () => {
               Geographic Distribution
             </h2>
             <div className="space-y-3 sm:space-y-4">
-              {analytics.locations.map((location, index) => (
+              {(analytics.locations || []).map((location, index) => (
                 <div key={location.country} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                   <div className="flex items-center">
                     <FaMapPin className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 mr-2 sm:mr-3" />
