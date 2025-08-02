@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import AnalyticsWidget from '../components/AnalyticsWidget';
 import { 
   HiMail,
   HiUserGroup,
@@ -25,10 +26,10 @@ import {
   HiFire,
   HiLightningBolt,
   HiRefresh,
+  HiPencil,
   HiDownload,
   HiUpload,
   HiTrash,
-  HiPencil,
   HiViewBoards,
   HiCollection,
   HiTemplate,
@@ -164,6 +165,42 @@ const AdminDashboard = () => {
           return <HiPencil className="w-5 h-5 text-orange-500" />;
         case 'CONTACT_SUBMISSION':
           return <HiMail className="w-5 h-5 text-indigo-500" />;
+        case 'MEDIA_UPLOAD':
+          return <HiPhotograph className="w-5 h-5 text-pink-500" />;
+        case 'MEDIA_DELETE':
+          return <HiTrash className="w-5 h-5 text-red-500" />;
+        case 'ANALYTICS_VIEW':
+          return <HiChartBar className="w-5 h-5 text-cyan-500" />;
+        case 'BACKUP_CREATE':
+          return <HiDownload className="w-5 h-5 text-teal-500" />;
+        case 'BACKUP_RESTORE':
+          return <HiUpload className="w-5 h-5 text-amber-500" />;
+        case 'TEMPLATE_CREATE':
+          return <HiTemplate className="w-5 h-5 text-emerald-500" />;
+        case 'COLLECTION_UPDATE':
+          return <HiCollection className="w-5 h-5 text-violet-500" />;
+        case 'VIEW_BOARDS':
+          return <HiViewBoards className="w-5 h-5 text-rose-500" />;
+        case 'COLOR_UPDATE':
+          return <HiColorSwatch className="w-5 h-5 text-lime-500" />;
+        case 'CHAT_MESSAGE':
+          return <HiChatAlt2 className="w-5 h-5 text-sky-500" />;
+        case 'STAR_RATING':
+          return <HiStar className="w-5 h-5 text-yellow-500" />;
+        case 'LIGHTNING_ACTION':
+          return <HiLightningBolt className="w-5 h-5 text-indigo-500" />;
+        case 'GLOBE_UPDATE':
+          return <HiGlobe className="w-5 h-5 text-blue-500" />;
+        case 'EYE_MONITOR':
+          return <HiEye className="w-5 h-5 text-orange-500" />;
+        case 'FIRE_SECURITY':
+          return <HiFire className="w-5 h-5 text-red-500" />;
+        case 'CALENDAR_EVENT':
+          return <HiCalendar className="w-5 h-5 text-purple-500" />;
+        case 'TRENDING_UP':
+          return <HiTrendingUp className="w-5 h-5 text-green-500" />;
+        case 'TRENDING_DOWN':
+          return <HiTrendingDown className="w-5 h-5 text-red-500" />;
         default:
           return <HiInformationCircle className="w-5 h-5 text-gray-500" />;
       }
@@ -267,16 +304,38 @@ const AdminDashboard = () => {
           <div className="text-xs text-gray-500 dark:text-gray-400">Uptime</div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <p className="text-gray-600 dark:text-gray-400">Last Backup</p>
-          <p className="font-medium text-gray-900 dark:text-white">
-            {stats.lastBackup.toLocaleDateString()}
-          </p>
+      
+      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+        <div className="flex items-center space-x-2">
+          <HiCalendar className="w-4 h-4 text-blue-600" />
+          <div>
+            <p className="text-gray-600 dark:text-gray-400">Last Backup</p>
+            <p className="font-medium text-gray-900 dark:text-white">
+              {stats.lastBackup.toLocaleDateString()}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-gray-600 dark:text-gray-400">Status</p>
-          <p className="font-medium text-green-600 dark:text-green-400 capitalize">{stats.systemHealth}</p>
+        <div className="flex items-center space-x-2">
+          <HiShieldCheck className="w-4 h-4 text-green-600" />
+          <div>
+            <p className="text-gray-600 dark:text-gray-400">Status</p>
+            <p className="font-medium text-green-600 dark:text-green-400 capitalize">{stats.systemHealth}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 text-xs">
+        <div className="flex items-center space-x-1">
+          <HiEye className="w-3 h-3 text-orange-600" />
+          <span className="text-gray-600 dark:text-gray-400">Monitoring</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <HiGlobe className="w-3 h-3 text-teal-600" />
+          <span className="text-gray-600 dark:text-gray-400">CDN</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <HiFire className="w-3 h-3 text-red-600" />
+          <span className="text-gray-600 dark:text-gray-400">Firewall</span>
         </div>
       </div>
     </div>
@@ -411,7 +470,7 @@ const AdminDashboard = () => {
             description="Monitor performance and visitor statistics"
             icon={<HiChartBar className="w-6 h-6 text-orange-600" />}
             color="text-orange-600"
-            link="/admin/contact/analytics"
+            link="/admin/analytics"
             gradient="hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 dark:hover:from-orange-900/10 dark:hover:to-red-900/10"
           />
           <QuickActionCard
@@ -432,41 +491,41 @@ const AdminDashboard = () => {
           />
         </div>
 
-        {/* System Health & Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Analytics Widget & System Health */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AnalyticsWidget />
+          
           {/* System Health */}
-          <div className="max-h-56 lg:col-span-1">
+          <div className="max-h-56">
             <SystemHealthCard />
           </div>
+        </div>
 
-          {/* Recent Activity */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
-                <Link 
-                  to="/admin/activity" 
-                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-                >
-                  View all
-                </Link>
+        {/* Recent Activity */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
+            <Link 
+              to="/admin/activity" 
+              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="space-y-3 max-h-36 overflow-y-auto">
+            {stats.recentActivity.length > 0 ? (
+              stats.recentActivity.map((activity) => (
+                <ActivityItem key={activity.id} activity={activity} />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <HiClock className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium">No recent activity</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                  Activity will appear here as you use the admin panel
+                </p>
               </div>
-              <div className="space-y-3 max-h-36 overflow-y-auto">
-                {stats.recentActivity.length > 0 ? (
-                  stats.recentActivity.map((activity) => (
-                    <ActivityItem key={activity.id} activity={activity} />
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <HiClock className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">No recent activity</p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                      Activity will appear here as you use the admin panel
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

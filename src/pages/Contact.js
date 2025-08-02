@@ -5,6 +5,7 @@ import { HiMail, HiPhone, HiLocationMarker, HiClock, HiGlobe, HiChat, HiUser, Hi
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { submitContactForm, getContactContent } from '../firebase/contactService';
+import { useAnalyticsTracking } from '../hooks/useAnalyticsTracking';
 
 // Components
 import PageLayout from '../components/layout/PageLayout';
@@ -28,6 +29,9 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [contactContent, setContactContent] = useState(null);
   const formRef = useRef();
+  
+  // Analytics tracking
+  const { trackFormSubmit, trackButtonClick, trackTimeOnPage } = useAnalyticsTracking();
 
   // Icon mapping function
   const getIconComponent = (iconName) => {
@@ -89,6 +93,16 @@ const Contact = () => {
       return () => form.removeEventListener('focusin', handleFormInteraction);
     }
   }, [formStartTime]);
+
+  // Track time on page
+  useEffect(() => {
+    const startTime = Date.now();
+    
+    return () => {
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+      trackTimeOnPage(timeSpent);
+    };
+  }, [trackTimeOnPage]);
 
   // Default contact info (fallback)
   const defaultContactInfo = [
@@ -193,6 +207,7 @@ const Contact = () => {
 
     if (!validateForm()) {
       toast.error("Please fix the errors in the form.");
+      trackFormSubmit('contact_form', false);
       return;
     }
 
@@ -213,6 +228,7 @@ const Contact = () => {
       
       if (result.success) {
         toast.success("Message sent successfully! I'll get back to you soon.");
+        trackFormSubmit('contact_form', true);
         setFormData({
           name: '',
           email: '',
@@ -232,6 +248,7 @@ const Contact = () => {
     } catch (error) {
       console.error('Contact form error:', error);
       toast.error("Something went wrong. Please try again later.");
+      trackFormSubmit('contact_form', false);
     } finally {
       setLoading(false);
     }
@@ -314,22 +331,25 @@ const Contact = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="p-6 text-center h-full">
-                    <div className="flex justify-center mb-4">
-                      <div className="w-12 h-12 bg-lightAccent/10 dark:bg-darkAccent/10 rounded-lg flex items-center justify-center">
-                        {React.createElement(IconComponent, { className: "text-lightAccent dark:text-darkAccent text-xl" })}
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2 text-lightAccent dark:text-darkAccent">
-                      {info.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 font-medium mb-1">
-                      {info.value}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
-                      {info.description}
-                    </p>
-                  </Card>
+                                     <Card 
+                     className="p-6 text-center h-full cursor-pointer hover:shadow-lg transition-shadow"
+                     onClick={() => trackButtonClick(`contact_info_${info.title.toLowerCase()}`, info.value)}
+                   >
+                     <div className="flex justify-center mb-4">
+                       <div className="w-12 h-12 bg-lightAccent/10 dark:bg-darkAccent/10 rounded-lg flex items-center justify-center">
+                         {React.createElement(IconComponent, { className: "text-lightAccent dark:text-darkAccent text-xl" })}
+                       </div>
+                     </div>
+                     <h3 className="text-lg font-semibold mb-2 text-lightAccent dark:text-darkAccent">
+                       {info.title}
+                     </h3>
+                     <p className="text-gray-600 dark:text-gray-400 font-medium mb-1">
+                       {info.value}
+                     </p>
+                     <p className="text-sm text-gray-500 dark:text-gray-500">
+                       {info.description}
+                     </p>
+                   </Card>
                 </motion.div>
               );
             })}
@@ -494,14 +514,26 @@ const Contact = () => {
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
                 {pageContent.ctaDescription}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}>
-                  Start a Project
-                </Button>
-                <Button variant="outline" as="a" href="/about" size="lg">
-                  Learn More About Me
-                </Button>
-              </div>
+                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                 <Button 
+                   size="lg" 
+                   onClick={() => {
+                     trackButtonClick('start_project_cta', 'contact_page');
+                     document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
+                   }}
+                 >
+                   Start a Project
+                 </Button>
+                 <Button 
+                   variant="outline" 
+                   as="a" 
+                   href="/about" 
+                   size="lg"
+                   onClick={() => trackButtonClick('learn_more_cta', 'about_page')}
+                 >
+                   Learn More About Me
+                 </Button>
+               </div>
             </Card>
           </motion.div>
         </Container>

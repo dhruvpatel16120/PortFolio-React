@@ -1,7 +1,8 @@
 // src/App.js
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, UNSAFE_future } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SettingsProvider from './context/SettingsContext';
+import AnalyticsProvider from './context/AnalyticsContext';
 import { useSettings } from './context/SettingsContext';
 
 // Components
@@ -48,7 +49,7 @@ const MaintenanceMode = () => (
 
 // Public Routes Component
 const PublicRoutes = () => {
-  const { isMaintenanceMode, settings } = useSettings();
+  const { isMaintenanceMode } = useSettings();
 
   // Show maintenance mode if enabled
   if (isMaintenanceMode()) {
@@ -80,13 +81,15 @@ export default function App() {
     <ErrorBoundary>
       <SettingsProvider>
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <Routes>
-            {/* Admin Routes - No Navbar/Footer */}
-            <Route path="/admin/*" element={<AdminApp />} />
-            
-            {/* Public Routes - With Navbar/Footer */}
-            <Route path="/*" element={<PublicRoutes />} />
-          </Routes>
+          <AnalyticsProvider>
+            <Routes>
+              {/* Admin Routes - No Navbar/Footer */}
+              <Route path="/admin/*" element={<AdminApp />} />
+              
+              {/* Public Routes - With Navbar/Footer */}
+              <Route path="/*" element={<PublicRoutes />} />
+            </Routes>
+          </AnalyticsProvider>
         </Router>
       </SettingsProvider>
     </ErrorBoundary>

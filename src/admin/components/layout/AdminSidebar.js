@@ -9,7 +9,6 @@ import {
   HiChevronDown,
   HiCheckCircle,
   HiMail,
-  HiUserGroup,
   HiSearch,
   HiTrendingUp,
   HiKey,
@@ -27,6 +26,7 @@ const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
     contact: true,
     projects: true,
     media: true,
+    analytics: true,
     settings: false
   });
   const [searchQuery, setSearchQuery] = useState('');
@@ -107,6 +107,19 @@ const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
           path: '/admin/media/analytics',
           icon: <HiChartBar className="w-4 h-4" />,
           description: 'Media statistics and insights'
+        },
+      ]
+    },
+    {
+      title: 'Analytics',
+      section: 'analytics',
+      icon: <HiTrendingUp className="w-5 h-5" />,
+      items: [
+        { 
+          title: 'Analytics Dashboard', 
+          path: '/admin/analytics',
+          icon: <HiChartBar className="w-4 h-4" />,
+          description: 'Website analytics and user behavior'
         },
       ]
     },

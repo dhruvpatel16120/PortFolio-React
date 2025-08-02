@@ -32,6 +32,9 @@ const ProjectManager = React.lazy(() => import('./pages/projects/ProjectManager'
 const ProjectContentManager = React.lazy(() => import('./pages/projects/ProjectContentManager'));
 const ProjectAnalytics = React.lazy(() => import('./pages/projects/ProjectAnalytics'));
 
+// Lazy load analytics pages
+const AnalyticsDashboard = React.lazy(() => import('./pages/analytics/AnalyticsDashboard'));
+
 // Session Management Component
 const SessionManager = ({ children }) => {
   const { settings } = useSettings();
@@ -86,6 +89,9 @@ const AdminApp = () => {
                     {/* Media Management */}
                     <Route path="/media" element={<MediaManager />} />
                     <Route path="/media/analytics" element={<MediaAnalytics />} />
+
+                    {/* Analytics */}
+                    <Route path="/analytics" element={<AnalyticsDashboard />} />
 
                     {/* Settings */}
                     <Route path="/settings" element={<GeneralSettings />} />

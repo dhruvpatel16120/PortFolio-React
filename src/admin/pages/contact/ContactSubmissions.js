@@ -329,68 +329,68 @@ const ContactSubmissions = () => {
   }
 
   return (
-    <div className="p-6 w-full">
+    <div className="p-4 sm:p-6 w-full">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Contact Submissions
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Manage and respond to contact form submissions from your portfolio visitors.
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <FaMailBulk className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <FaMailBulk className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Submissions</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{submissions.length}</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{submissions.length}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <HiUser className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <HiUser className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">New</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">New</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
                   {submissions.filter(s => s.status === 'new').length}
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                <HiCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <HiCheck className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Replied</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Replied</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
                   {submissions.filter(s => s.status === 'replied').length}
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <FaGlobe className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <FaGlobe className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Countries</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Countries</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
                   {new Set(submissions.map(s => s.location?.country).filter(Boolean)).size}
                 </p>
               </div>
@@ -399,9 +399,10 @@ const ContactSubmissions = () => {
         </div>
 
         {/* Filters and Actions */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6">
+          <div className="space-y-4">
+            {/* Search and Filters Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Search */}
               <div className="relative">
                 <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -410,7 +411,7 @@ const ContactSubmissions = () => {
                   placeholder="Search submissions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
                 />
               </div>
 
@@ -418,7 +419,7 @@ const ContactSubmissions = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="all">All Status</option>
                 <option value="new">New</option>
@@ -431,7 +432,7 @@ const ContactSubmissions = () => {
               <select
                 value={deviceFilter}
                 onChange={(e) => setDeviceFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="all">All Devices</option>
                 <option value="desktop">Desktop</option>
@@ -443,7 +444,7 @@ const ContactSubmissions = () => {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -453,11 +454,12 @@ const ContactSubmissions = () => {
               </select>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <button
                 onClick={exportData}
                 disabled={filteredSubmissions.length === 0}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 <HiDownload className="w-4 h-4 mr-2" />
                 Export
@@ -465,7 +467,7 @@ const ContactSubmissions = () => {
               <button
                 onClick={loadSubmissions}
                 disabled={updating}
-                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
+                className="flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 text-sm"
               >
                 <HiRefresh className={`w-4 h-4 mr-2 ${updating ? 'animate-spin' : ''}`} />
                 Refresh
@@ -476,8 +478,8 @@ const ContactSubmissions = () => {
           {/* Bulk Operations */}
           {selectedItems.length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {selectedItems.length} item(s) selected
                   </span>
@@ -511,8 +513,8 @@ const ContactSubmissions = () => {
           )}
         </div>
 
-        {/* Submissions Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        {/* Submissions Table - Desktop */}
+        <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
@@ -643,88 +645,195 @@ const ContactSubmissions = () => {
               </tbody>
             </table>
           </div>
-
-          {filteredSubmissions.length === 0 && (
-            <div className="text-center py-12">
-              <HiMail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
-                {submissions.length === 0 ? 'No submissions yet' : 'No submissions match your filters'}
-              </p>
-            </div>
-          )}
         </div>
+
+        {/* Submissions Cards - Mobile/Tablet */}
+        <div className="lg:hidden space-y-4">
+          {filteredSubmissions.map((submission) => (
+            <div key={submission.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(submission.id)}
+                    onChange={(e) => handleSelectItem(submission.id, e.target.checked)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                      {submission.name || 'Anonymous'}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {submission.email || 'No email'}
+                    </p>
+                  </div>
+                </div>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(submission.status)}`}>
+                  {submission.status || 'new'}
+                </span>
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Subject</p>
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {submission.subject || 'No subject'}
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <p className="font-medium text-gray-500 dark:text-gray-400">Device</p>
+                    <div className="flex items-center mt-1">
+                      {getDeviceIcon(submission.deviceInfo?.type)}
+                      <span className="ml-1 text-gray-900 dark:text-white capitalize">
+                        {submission.deviceInfo?.type || 'unknown'}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-500 dark:text-gray-400">Date</p>
+                    <p className="text-gray-900 dark:text-white mt-1">
+                      {submission.timestamp ? new Date(submission.timestamp).toLocaleDateString() : 'Unknown'}
+                    </p>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="font-medium text-gray-500 dark:text-gray-400">Location</p>
+                  <div className="flex items-center mt-1">
+                    <FaMapPin className="w-3 h-3 text-gray-400 mr-1" />
+                    <span className="text-xs text-gray-900 dark:text-white">
+                      {submission.location?.city && submission.location?.country 
+                        ? `${submission.location.city}, ${submission.location.country}`
+                        : 'Unknown location'
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => viewSubmission(submission)}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1"
+                    title="View Details"
+                  >
+                    <HiEye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate(`/admin/contact/reply/${submission.id}`)}
+                    className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1"
+                    title="Reply"
+                  >
+                    <IoIosSend className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => deleteSubmission(submission.id)}
+                    disabled={updating}
+                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 p-1"
+                    title="Delete"
+                  >
+                    <HiTrash className="w-4 h-4" />
+                  </button>
+                </div>
+                <select
+                  value={submission.status || 'new'}
+                  onChange={(e) => updateStatus(submission.id, e.target.value)}
+                  disabled={updating}
+                  className="text-xs border border-gray-300 dark:border-gray-600 rounded px-2 py-1 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="new">New</option>
+                  <option value="read">Read</option>
+                  <option value="replied">Replied</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredSubmissions.length === 0 && (
+          <div className="text-center py-12">
+            <HiMail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">
+              {submissions.length === 0 ? 'No submissions yet' : 'No submissions match your filters'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Submission Detail Modal */}
       {showModal && selectedSubmission && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                   Submission Details
                 </h2>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1"
                 >
-                  <HiX className="w-6 h-6" />
+                  <HiX className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Contact Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                     Contact Information
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.name || 'Anonymous'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Name</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">{selectedSubmission.name || 'Anonymous'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.email || 'No email'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white break-all">{selectedSubmission.email || 'No email'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Subject</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.subject || 'No subject'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Subject</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">{selectedSubmission.subject || 'No subject'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Message</label>
-                      <p className="text-gray-900 dark:text-white whitespace-pre-wrap">{selectedSubmission.message || 'No message'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Message</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white whitespace-pre-wrap max-h-32 overflow-y-auto">{selectedSubmission.message || 'No message'}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Technical Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                     Technical Information
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">IP Address</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.ipAddress || 'Unknown'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">IP Address</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white break-all">{selectedSubmission.ipAddress || 'Unknown'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Device</label>
-                      <p className="text-gray-900 dark:text-white">
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Device</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">
                         {selectedSubmission.deviceInfo?.type || 'Unknown'} - {selectedSubmission.deviceInfo?.os || 'Unknown OS'}
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Browser</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.deviceInfo?.browser || 'Unknown'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Browser</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">{selectedSubmission.deviceInfo?.browser || 'Unknown'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Screen Resolution</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.deviceInfo?.screenResolution || 'Unknown'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Screen Resolution</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">{selectedSubmission.deviceInfo?.screenResolution || 'Unknown'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Location</label>
-                      <p className="text-gray-900 dark:text-white">
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Location</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">
                         {selectedSubmission.location?.city && selectedSubmission.location?.country 
                           ? `${selectedSubmission.location.city}, ${selectedSubmission.location.country}`
                           : 'Unknown location'
@@ -732,27 +841,27 @@ const ContactSubmissions = () => {
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Timezone</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.location?.timezone || 'Unknown'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Timezone</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">{selectedSubmission.location?.timezone || 'Unknown'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Form Duration</label>
-                      <p className="text-gray-900 dark:text-white">
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Form Duration</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white">
                         {selectedSubmission.metadata?.formDuration ? `${selectedSubmission.metadata.formDuration} seconds` : 'Unknown'}
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Referrer</label>
-                      <p className="text-gray-900 dark:text-white">{selectedSubmission.metadata?.referrer || 'Direct'}</p>
+                      <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Referrer</label>
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white break-all">{selectedSubmission.metadata?.referrer || 'Direct'}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end space-x-3">
+              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  className="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
                 >
                   Close
                 </button>
@@ -761,7 +870,7 @@ const ContactSubmissions = () => {
                     setShowModal(false);
                     navigate(`/admin/contact/reply/${selectedSubmission.id}`);
                   }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
                 >
                   Reply
                 </button>

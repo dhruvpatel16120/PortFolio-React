@@ -381,22 +381,22 @@ const ContactContentManager = () => {
   }
 
   return (
-    <div className="p-6 w-full bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="p-4 sm:p-6 w-full bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 Contact Content Manager
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 Manage your contact page content, contact information, and form settings.
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               {hasChanges && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg text-sm">
+                <div className="flex items-center justify-center gap-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg text-sm">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
                   Unsaved changes
                 </div>
@@ -404,16 +404,16 @@ const ContactContentManager = () => {
               <button
                 onClick={saveChanges}
                 disabled={saving || !hasChanges}
-                className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md"
+                className="w-full sm:w-auto flex items-center justify-center px-4 sm:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md text-sm"
               >
-                <HiSave className="w-5 h-5 mr-2" />
+                <HiSave className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
               <button
                 onClick={resetToDefaults}
-                className="flex items-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 shadow-md"
+                className="w-full sm:w-auto flex items-center justify-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 shadow-md text-sm"
               >
-                <HiRefresh className="w-5 h-5 mr-2" />
+                <HiRefresh className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Reset
               </button>
             </div>
@@ -421,21 +421,22 @@ const ContactContentManager = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex space-x-8 overflow-x-auto">
+            <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200 ${
+                  className={`flex items-center gap-1 sm:gap-2 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors duration-200 ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  <tab.icon className="w-5 h-5" />
-                  {tab.label}
+                  <tab.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                 </button>
               ))}
             </nav>
@@ -446,14 +447,14 @@ const ContactContentManager = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           {/* Contact Information Tab */}
           {activeTab === 'contact-info' && (
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Contact Information
                 </h2>
                 <button
                   onClick={addContactInfo}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm transition-colors duration-200"
+                  className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm transition-colors duration-200"
                 >
                   <HiPlus className="w-4 h-4 mr-1" />
                   Add Contact
@@ -463,10 +464,10 @@ const ContactContentManager = () => {
               <div className="grid gap-4">
                 {contactInfo.map((info, index) => (
                   <div key={info.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                       <div className="flex items-center space-x-2">
-                        {React.createElement(getIconComponent(info.icon), { className: "w-5 h-5 text-blue-600" })}
-                        <span className="font-medium text-gray-900 dark:text-white">Contact {index + 1}</span>
+                        {React.createElement(getIconComponent(info.icon), { className: "w-4 h-4 sm:w-5 sm:h-5 text-blue-600" })}
+                        <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">Contact {index + 1}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <label className="flex items-center">
@@ -476,7 +477,7 @@ const ContactContentManager = () => {
                             onChange={(e) => handleContactInfoChange(info.id, 'active', e.target.checked)}
                             className="mr-2 rounded"
                           />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Active</span>
+                          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Active</span>
                         </label>
                         <button
                           onClick={() => removeContactInfo(info.id)}
@@ -487,26 +488,26 @@ const ContactContentManager = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Title
                         </label>
                         <input
                           type="text"
                           value={info.title}
                           onChange={(e) => handleContactInfoChange(info.id, 'title', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Icon
                         </label>
                         <select
                           value={info.icon}
                           onChange={(e) => handleContactInfoChange(info.id, 'icon', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                         >
                           {iconOptions.map(option => (
                             <option key={option.value} value={option.value}>
@@ -518,39 +519,39 @@ const ContactContentManager = () => {
                     </div>
 
                     <div className="mt-3">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Value
                       </label>
                       <input
                         type="text"
                         value={info.value}
                         onChange={(e) => handleContactInfoChange(info.id, 'value', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                       />
                     </div>
 
                     <div className="mt-3">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Link (optional)
                       </label>
                       <input
                         type="text"
                         value={info.link}
                         onChange={(e) => handleContactInfoChange(info.id, 'link', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                         placeholder="https://..."
                       />
                     </div>
 
                     <div className="mt-3">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Description
                       </label>
                       <input
                         type="text"
                         value={info.description}
                         onChange={(e) => handleContactInfoChange(info.id, 'description', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                       />
                     </div>
                   </div>
@@ -561,56 +562,56 @@ const ContactContentManager = () => {
 
           {/* Hero Section Tab */}
           {activeTab === 'hero-section' && (
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <div className="p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 Hero Section
               </h2>
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Hero Title
                   </label>
                   <input
                     type="text"
                     value={pageContent.heroTitle}
                     onChange={(e) => handlePageContentChange('heroTitle', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-lg"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-base sm:text-lg"
                     placeholder="Enter hero title..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Hero Description
                   </label>
                   <textarea
                     value={pageContent.heroDescription}
                     onChange={(e) => handlePageContentChange('heroDescription', e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter hero description..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Section Title
                   </label>
                   <input
                     type="text"
                     value={pageContent.sectionTitle}
                     onChange={(e) => handlePageContentChange('sectionTitle', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter section title..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Section Description
                   </label>
                   <textarea
                     value={pageContent.sectionDescription}
                     onChange={(e) => handlePageContentChange('sectionDescription', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter section description..."
                   />
                 </div>
@@ -620,56 +621,56 @@ const ContactContentManager = () => {
 
           {/* Contact Form Tab */}
           {activeTab === 'form-section' && (
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <div className="p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 Contact Form
               </h2>
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Form Title
                   </label>
                   <input
                     type="text"
                     value={pageContent.formTitle}
                     onChange={(e) => handlePageContentChange('formTitle', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter form title..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Form Description
                   </label>
                   <textarea
                     value={pageContent.formDescription}
                     onChange={(e) => handlePageContentChange('formDescription', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter form description..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     CTA Title
                   </label>
                   <input
                     type="text"
                     value={pageContent.ctaTitle}
                     onChange={(e) => handlePageContentChange('ctaTitle', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter CTA title..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     CTA Description
                   </label>
                   <textarea
                     value={pageContent.ctaDescription}
                     onChange={(e) => handlePageContentChange('ctaDescription', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     placeholder="Enter CTA description..."
                   />
                 </div>
@@ -679,14 +680,14 @@ const ContactContentManager = () => {
 
           {/* Services Tab */}
           {activeTab === 'services' && (
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Services Offered
                 </h2>
                 <button
                   onClick={addService}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm transition-colors duration-200"
+                  className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm transition-colors duration-200"
                 >
                   <HiPlus className="w-4 h-4 mr-1" />
                   Add Service
@@ -694,19 +695,19 @@ const ContactContentManager = () => {
               </div>
               <div className="space-y-3">
                 {pageContent.services.map((service, index) => (
-                  <div key={index} className="flex items-center space-x-3">
+                  <div key={index} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                     <input
                       type="text"
                       value={service}
                       onChange={(e) => handleServiceChange(index, e.target.value)}
-                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                      className="flex-1 px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                       placeholder="Enter service description..."
                     />
                     <button
                       onClick={() => removeService(index)}
-                      className="text-red-600 hover:text-red-800 transition-colors duration-200 p-2"
+                      className="w-full sm:w-auto flex items-center justify-center text-red-600 hover:text-red-800 transition-colors duration-200 p-2"
                     >
-                      <HiTrash className="w-5 h-5" />
+                      <HiTrash className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 ))}
@@ -716,14 +717,14 @@ const ContactContentManager = () => {
 
           {/* Response Times Tab */}
           {activeTab === 'response-times' && (
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Response Times
                 </h2>
                 <button
                   onClick={addResponseTime}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm transition-colors duration-200"
+                  className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm transition-colors duration-200"
                 >
                   <HiPlus className="w-4 h-4 mr-1" />
                   Add Time
@@ -731,13 +732,13 @@ const ContactContentManager = () => {
               </div>
               <div className="space-y-4">
                 {pageContent.responseTimes.map((time, index) => (
-                  <div key={index} className="grid grid-cols-2 gap-3">
+                  <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input
                       type="text"
                       value={time.label}
                       onChange={(e) => handleResponseTimeChange(index, 'label', e.target.value)}
                       placeholder="Label (e.g., Initial response)"
-                      className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                      className="px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                     />
                     <div className="flex items-center space-x-2">
                       <input
@@ -745,13 +746,13 @@ const ContactContentManager = () => {
                         value={time.time}
                         onChange={(e) => handleResponseTimeChange(index, 'time', e.target.value)}
                         placeholder="Time (e.g., Within 24 hours)"
-                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200"
+                        className="flex-1 px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white transition-colors duration-200 text-sm"
                       />
                       <button
                         onClick={() => removeResponseTime(index)}
                         className="text-red-600 hover:text-red-800 transition-colors duration-200 p-2"
                       >
-                        <HiTrash className="w-5 h-5" />
+                        <HiTrash className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
                   </div>
@@ -762,31 +763,31 @@ const ContactContentManager = () => {
 
           {/* Preview Tab */}
           {activeTab === 'preview' && (
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Live Preview
                 </h2>
-                                 <button 
-                   onClick={() => window.open('/contact', '_blank')}
-                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors duration-200"
-                 >
-                   <HiEye className="w-4 h-4 mr-1" />
-                   View Full Page
-                 </button>
+                <button 
+                  onClick={() => window.open('/contact', '_blank')}
+                  className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition-colors duration-200"
+                >
+                  <HiEye className="w-4 h-4 mr-1" />
+                  View Full Page
+                </button>
               </div>
               
-              <div className="grid lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                 {/* Contact Info Preview */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Contact Information</h3>
+                  <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-4">Contact Information</h3>
                   <div className="space-y-3">
                     {contactInfo.filter(info => info.active).map((info, index) => (
-                      <div key={info.id} className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        {React.createElement(getIconComponent(info.icon), { className: "w-6 h-6 text-blue-600" })}
+                      <div key={info.id} className="flex items-center space-x-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        {React.createElement(getIconComponent(info.icon), { className: "w-5 h-5 sm:w-6 sm:h-6 text-blue-600" })}
                         <div>
-                          <p className="font-medium text-gray-900 dark:text-white">{info.title}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{info.value}</p>
+                          <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">{info.title}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{info.value}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-500">{info.description}</p>
                         </div>
                       </div>
@@ -796,16 +797,16 @@ const ContactContentManager = () => {
 
                 {/* Form Preview */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Contact Form</h3>
+                  <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-4">Contact Form</h3>
                   <div className="space-y-4">
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">{pageContent.formTitle}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{pageContent.formDescription}</p>
+                    <div className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm sm:text-base">{pageContent.formTitle}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{pageContent.formDescription}</p>
                     </div>
                     <div className="space-y-2">
                       {formFields.filter(field => field.active).map(field => (
                         <div key={field.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{field.label}</span>
+                          <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{field.label}</span>
                           {field.required && <span className="text-red-500 ml-1">*</span>}
                         </div>
                       ))}
@@ -815,13 +816,13 @@ const ContactContentManager = () => {
               </div>
 
               {/* Hero Section Preview */}
-              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Hero Section Preview</h3>
+              <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg">
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-4">Hero Section Preview</h3>
                 <div className="text-center">
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
                     {pageContent.heroTitle}
                   </h1>
-                  <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                  <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                     {pageContent.heroDescription}
                   </p>
                 </div>
