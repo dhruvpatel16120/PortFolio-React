@@ -57,7 +57,7 @@ A modern, responsive portfolio website built with React, featuring a comprehensi
 ## 📁 Project Structure
 
 ```
-PortFolio-WebSite-v1-main/
+PortFolio-WebSite/
 ├── public/                 # Static assets
 ├── src/
 │   ├── admin/             # Admin panel components
@@ -73,8 +73,8 @@ PortFolio-WebSite-v1-main/
 │   ├── services/          # API and external services
 │   └── assets/            # Static assets
 ├── scripts/               # Setup and utility scripts
-├── preview/               # Website preview images
-└── docs/                  # Documentation
+└── preview/               # Website preview images
+
 ```
 
 ## 🚀 Quick Start
@@ -89,7 +89,7 @@ PortFolio-WebSite-v1-main/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/portfolio-website.git
+   git clone 
    cd portfolio-website
    ```
 
@@ -278,7 +278,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support and questions:
 - Create an issue on GitHub
 - Contact through the website contact form
-- Email: [your-email@domain.com]
+- Email: [dhruvpatel16120@gmail.com]
 
 ---
 
