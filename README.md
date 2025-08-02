@@ -89,8 +89,8 @@ PortFolio-WebSite/
 
 1. **Clone the repository**
    ```bash
-   git clone 
-   cd portfolio-website
+   git clone https://github.com/dhruvpatel16120/PortFolio-WebSite.git
+   cd PortFolio-WebSite
    ```
 
 2. **Install dependencies**
