@@ -18,7 +18,7 @@ const AdminFooter = () => {
               <span className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Admin Panel</span>
             </div>
             <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 mb-2 lg:mb-3">
-              Professional portfolio management system with advanced security features and comprehensive analytics.
+              Professional portfolio management system with advanced security features.
             </p>
             <div className="flex flex-wrap items-center gap-2 lg:gap-4 text-xs text-gray-500 dark:text-gray-400">
               <span className="flex items-center">
@@ -47,11 +47,6 @@ const AdminFooter = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/settings" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Settings
-                </Link>
-              </li>
-              <li>
                 <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   View Portfolio
                 </Link>
@@ -63,16 +58,6 @@ const AdminFooter = () => {
           <div>
             <h3 className="text-xs lg:text-sm font-semibold text-gray-900 dark:text-white mb-2 lg:mb-3">Support</h3>
             <ul className="space-y-1 lg:space-y-2 text-xs lg:text-sm">
-              <li>
-                <Link to="/admin/settings/help" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/settings/security" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Security Guide
-                </Link>
-              </li>
               <li>
                 <a href="mailto:support@example.com" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   Contact Support

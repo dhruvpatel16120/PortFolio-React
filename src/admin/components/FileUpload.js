@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { cloudinaryService } from '../services/fileUploadService';
 import fileUploadService from '../../services/fileUploadService';
-import { useSettings } from '../../context/SettingsContext';
 import { toast } from 'react-toastify';
 
 const FileUpload = ({ 
@@ -12,7 +11,6 @@ const FileUpload = ({
   allowedTypes = ['image', 'video'],
   className = ''
 }) => {
-  const { settings } = useSettings();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -32,8 +30,8 @@ const FileUpload = ({
         throw new Error(`Maximum ${maxFiles} files allowed`);
       }
 
-      // Validate files using settings
-      const validationResults = fileUploadService.validateFiles(fileArray, settings);
+      // Validate files
+      const validationResults = fileUploadService.validateFiles(fileArray);
       const invalidFiles = validationResults.filter(result => !result.valid);
       
       if (invalidFiles.length > 0) {
@@ -44,7 +42,7 @@ const FileUpload = ({
       }
 
       // Check total file size
-      const totalSizeCheck = fileUploadService.checkTotalSize(fileArray, settings);
+      const totalSizeCheck = fileUploadService.checkTotalSize(fileArray);
       if (!totalSizeCheck.valid) {
         throw new Error(totalSizeCheck.error);
       }
@@ -82,7 +80,7 @@ const FileUpload = ({
       setIsUploading(false);
       setUploadProgress(0);
     }
-  }, [maxFiles, allowedTypes, folder, onUploadSuccess, onUploadError, settings]);
+  }, [maxFiles, allowedTypes, folder, onUploadSuccess, onUploadError]);
 
   // Handle drag and drop
   const handleDragOver = useCallback((e) => {
@@ -109,7 +107,7 @@ const FileUpload = ({
   }, [handleFileSelect]);
 
   // Get max upload size for display
-  const maxUploadSize = settings ? settings.maxUploadSize : 10;
+  const maxUploadSize = 10;
 
   return (
     <div className={`file-upload ${className}`}>

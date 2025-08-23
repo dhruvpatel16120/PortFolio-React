@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiSun, FiMoon, FiMenu, FiX, FiHome, FiUser, FiBriefcase, FiMail, FiFileText } from 'react-icons/fi';
 import { useTheme } from "../context/ThemeContext";
-import { useSettings } from "../context/SettingsContext";
 
 const Navbar = () => {
   const { darkMode, toggleDarkMode } = useTheme();
-  const { settings } = useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();

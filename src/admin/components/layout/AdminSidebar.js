@@ -3,21 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   HiHome,
   HiDocumentText,
-  HiCog,
-  HiShieldCheck,
   HiX,
   HiChevronDown,
   HiCheckCircle,
   HiMail,
   HiSearch,
-  HiTrendingUp,
-  HiKey,
-  HiGlobeAlt,
   HiChatAlt2,
   HiCode,
   HiCollection,
-  HiChartBar,
-  HiPhotograph
+  HiPhotograph,
+  HiShieldCheck
 } from 'react-icons/hi';
 
 const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
@@ -25,9 +20,7 @@ const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
     dashboard: true,
     contact: true,
     projects: true,
-    media: true,
-    analytics: true,
-    settings: false
+    media: true
   });
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
@@ -57,13 +50,7 @@ const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
           icon: <HiChatAlt2 className="w-4 h-4" />,
           description: 'View and manage submissions',
           badge: '3'
-        },
-        { 
-          title: 'Contact Analytics', 
-          path: '/admin/contact/analytics',
-          icon: <HiTrendingUp className="w-4 h-4" />,
-          description: 'Contact form analytics'
-        },
+        }
       ]
     },
     {
@@ -82,13 +69,7 @@ const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
           path: '/admin/projects/content',
           icon: <HiDocumentText className="w-4 h-4" />,
           description: 'Edit projects page content'
-        },
-        { 
-          title: 'Project Analytics', 
-          path: '/admin/projects/analytics',
-          icon: <HiChartBar className="w-4 h-4" />,
-          description: 'Project statistics and insights'
-        },
+        }
       ]
     },
     {
@@ -101,50 +82,6 @@ const AdminSidebar = ({ isOpen, onClose, isMobile = false }) => {
           path: '/admin/media',
           icon: <HiPhotograph className="w-4 h-4" />,
           description: 'Upload, edit, and manage media files'
-        },
-        { 
-          title: 'Media Analytics', 
-          path: '/admin/media/analytics',
-          icon: <HiChartBar className="w-4 h-4" />,
-          description: 'Media statistics and insights'
-        },
-      ]
-    },
-    {
-      title: 'Analytics',
-      section: 'analytics',
-      icon: <HiTrendingUp className="w-5 h-5" />,
-      items: [
-        { 
-          title: 'Analytics Dashboard', 
-          path: '/admin/analytics',
-          icon: <HiChartBar className="w-4 h-4" />,
-          description: 'Website analytics and user behavior'
-        },
-      ]
-    },
-    {
-      title: 'Settings',
-      section: 'settings',
-      icon: <HiCog className="w-5 h-5" />,
-      items: [
-        { 
-          title: 'General Settings', 
-          path: '/admin/settings',
-          icon: <HiCog className="w-4 h-4" />,
-          description: 'Basic configuration'
-        },
-        { 
-          title: 'Security Settings', 
-          path: '/admin/settings/security',
-          icon: <HiKey className="w-4 h-4" />,
-          description: 'Security and authentication'
-        },
-        { 
-          title: 'Site Configuration', 
-          path: '/admin/settings/site',
-          icon: <HiGlobeAlt className="w-4 h-4" />,
-          description: 'Site-wide settings'
         }
       ]
     }

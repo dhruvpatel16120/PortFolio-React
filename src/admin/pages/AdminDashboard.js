@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import AnalyticsWidget from '../components/AnalyticsWidget';
 import { 
   HiMail,
   HiUserGroup,
   HiDocumentText,
-  HiChartBar,
   HiShieldCheck,
   HiPlus,
   HiClock,
@@ -19,7 +17,6 @@ import {
   HiTrendingDown,
   HiCalendar,
   HiGlobe,
-  HiCog,
   HiPhotograph,
   HiChatAlt2,
   HiStar,
@@ -169,8 +166,6 @@ const AdminDashboard = () => {
           return <HiPhotograph className="w-5 h-5 text-pink-500" />;
         case 'MEDIA_DELETE':
           return <HiTrash className="w-5 h-5 text-red-500" />;
-        case 'ANALYTICS_VIEW':
-          return <HiChartBar className="w-5 h-5 text-cyan-500" />;
         case 'BACKUP_CREATE':
           return <HiDownload className="w-5 h-5 text-teal-500" />;
         case 'BACKUP_RESTORE':
@@ -433,7 +428,6 @@ const AdminDashboard = () => {
             value={stats.uptime}
             icon={<HiShieldCheck className="w-6 h-6 text-emerald-600" />}
             color="text-emerald-600"
-            link="/admin/settings"
             subtitle="Uptime percentage"
           />
         </div>
@@ -465,37 +459,10 @@ const AdminDashboard = () => {
             link="/admin/media"
             gradient="hover:bg-gradient-to-br hover:from-emerald-50 hover:to-teal-50 dark:hover:from-emerald-900/10 dark:hover:to-teal-900/10"
           />
-          <QuickActionCard
-            title="Analytics & Reports"
-            description="Monitor performance and visitor statistics"
-            icon={<HiChartBar className="w-6 h-6 text-orange-600" />}
-            color="text-orange-600"
-            link="/admin/analytics"
-            gradient="hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 dark:hover:from-orange-900/10 dark:hover:to-red-900/10"
-          />
-          <QuickActionCard
-            title="Security Settings"
-            description="Manage account security and system settings"
-            icon={<HiShieldCheck className="w-6 h-6 text-red-600" />}
-            color="text-red-600"
-            link="/admin/settings/security"
-            gradient="hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 dark:hover:from-red-900/10 dark:hover:to-pink-900/10"
-          />
-          <QuickActionCard
-            title="Site Configuration"
-            description="Configure site-wide settings and SEO"
-            icon={<HiCog className="w-6 h-6 text-gray-600" />}
-            color="text-gray-600"
-            link="/admin/settings/site"
-            gradient="hover:bg-gradient-to-br hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-900/10 dark:hover:to-slate-900/10"
-          />
         </div>
 
-        {/* Analytics Widget & System Health */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AnalyticsWidget />
-          
-          {/* System Health */}
+        {/* System Health */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <div className="max-h-56">
             <SystemHealthCard />
           </div>

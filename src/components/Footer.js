@@ -4,11 +4,9 @@ import {
   FiGithub, FiLinkedin, FiMail, FiMapPin, 
   FiExternalLink, FiArrowUp, FiInstagram
 } from 'react-icons/fi';
-import { useSettings } from '../context/SettingsContext';
 
 const Footer = () => {
   const [currentYear] = useState(new Date().getFullYear());
-  const { settings } = useSettings();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -57,7 +55,7 @@ const Footer = () => {
                   style={{ fontFamily: 'Dancing Script, Poppins, sans-serif' }}
                   className="text-2xl font-semibold text-lightAccent dark:text-darkAccent hover:scale-105 transform transition-all duration-300 font-[Poppins] drop-shadow-lg"
                 >
-                  {settings.siteName || "Dhruv's PortFolio"}
+                  Dhruv's Portfolio
                 </Link>
               </div>
               <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">

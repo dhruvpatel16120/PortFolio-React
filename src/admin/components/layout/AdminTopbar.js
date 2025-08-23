@@ -182,14 +182,6 @@ const AdminTopbar = ({ toggleSidebar, sidebarOpen, isMobile = false }) => {
             {showUserMenu && (
               <div className={`absolute right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 ${isMobile ? 'w-40' : 'w-48'}`}>
                 <div className="py-1">
-                  <Link
-                    to="/admin/settings"
-                    className="flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <HiShieldCheck className="w-4 h-4 mr-2" />
-                    Settings
-                  </Link>
-                  <hr className="my-1 border-gray-200 dark:border-gray-700" />
                   <button
                     onClick={handleLogout}
                     className="flex items-center w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"

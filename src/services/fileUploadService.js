@@ -1,21 +1,19 @@
-import { useSettings } from '../context/SettingsContext';
-
 class FileUploadService {
   constructor() {
     this.defaultMaxSize = 10 * 1024 * 1024; // 10MB default
     this.defaultAllowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword'];
   }
 
-  // Validate file upload based on settings
-  validateFile(file, settings = null) {
-    const maxSize = settings ? settings.maxUploadSize * 1024 * 1024 : this.defaultMaxSize;
+  // Validate file upload
+  validateFile(file) {
+    const maxSize = this.defaultMaxSize;
     const allowedTypes = this.defaultAllowedTypes;
 
     // Check file size
     if (file.size > maxSize) {
       return {
         valid: false,
-        error: `File size exceeds maximum allowed size of ${settings ? settings.maxUploadSize : 10}MB`
+        error: `File size exceeds maximum allowed size of 10MB`
       };
     }
 
@@ -30,9 +28,9 @@ class FileUploadService {
     return { valid: true };
   }
 
-  // Get max upload size from settings
-  getMaxUploadSize(settings) {
-    return settings ? settings.maxUploadSize * 1024 * 1024 : this.defaultMaxSize;
+  // Get max upload size
+  getMaxUploadSize() {
+    return this.defaultMaxSize;
   }
 
   // Format file size for display
@@ -47,11 +45,11 @@ class FileUploadService {
   }
 
   // Validate multiple files
-  validateFiles(files, settings = null) {
+  validateFiles(files) {
     const results = [];
     
     for (let i = 0; i < files.length; i++) {
-      const result = this.validateFile(files[i], settings);
+      const result = this.validateFile(files[i]);
       results.push({
         file: files[i],
         index: i,
@@ -63,8 +61,8 @@ class FileUploadService {
   }
 
   // Check if all files are valid
-  areFilesValid(files, settings = null) {
-    const results = this.validateFiles(files, settings);
+  areFilesValid(files) {
+    const results = this.validateFiles(files);
     return results.every(result => result.valid);
   }
 
@@ -74,15 +72,15 @@ class FileUploadService {
   }
 
   // Check if total size exceeds limit
-  checkTotalSize(files, settings = null) {
+  checkTotalSize(files) {
     const totalSize = this.getTotalSize(files);
-    const maxSize = settings ? settings.maxUploadSize * 1024 * 1024 : this.defaultMaxSize;
+    const maxSize = this.defaultMaxSize;
     
     return {
       valid: totalSize <= maxSize,
       totalSize,
       maxSize,
-      error: totalSize > maxSize ? `Total file size exceeds maximum allowed size of ${settings ? settings.maxUploadSize : 10}MB` : null
+      error: totalSize > maxSize ? `Total file size exceeds maximum allowed size of 10MB` : null
     };
   }
 

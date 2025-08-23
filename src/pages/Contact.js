@@ -5,7 +5,6 @@ import { HiMail, HiPhone, HiLocationMarker, HiClock, HiGlobe, HiChat, HiUser, Hi
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { submitContactForm, getContactContent } from '../firebase/contactService';
-import { useAnalyticsTracking } from '../hooks/useAnalyticsTracking';
 
 // Components
 import PageLayout from '../components/layout/PageLayout';
@@ -30,9 +29,6 @@ const Contact = () => {
   const [contactContent, setContactContent] = useState(null);
   const formRef = useRef();
   
-  // Analytics tracking
-  const { trackFormSubmit, trackButtonClick, trackTimeOnPage } = useAnalyticsTracking();
-
   // Icon mapping function
   const getIconComponent = (iconName) => {
     const iconMap = {
@@ -93,16 +89,6 @@ const Contact = () => {
       return () => form.removeEventListener('focusin', handleFormInteraction);
     }
   }, [formStartTime]);
-
-  // Track time on page
-  useEffect(() => {
-    const startTime = Date.now();
-    
-    return () => {
-      const timeSpent = Math.round((Date.now() - startTime) / 1000);
-      trackTimeOnPage(timeSpent);
-    };
-  }, [trackTimeOnPage]);
 
   // Default contact info (fallback)
   const defaultContactInfo = [
@@ -207,7 +193,6 @@ const Contact = () => {
 
     if (!validateForm()) {
       toast.error("Please fix the errors in the form.");
-      trackFormSubmit('contact_form', false);
       return;
     }
 
@@ -228,7 +213,6 @@ const Contact = () => {
       
       if (result.success) {
         toast.success("Message sent successfully! I'll get back to you soon.");
-        trackFormSubmit('contact_form', true);
         setFormData({
           name: '',
           email: '',
@@ -248,7 +232,6 @@ const Contact = () => {
     } catch (error) {
       console.error('Contact form error:', error);
       toast.error("Something went wrong. Please try again later.");
-      trackFormSubmit('contact_form', false);
     } finally {
       setLoading(false);
     }
@@ -333,7 +316,6 @@ const Contact = () => {
                 >
                                      <Card 
                      className="p-6 text-center h-full cursor-pointer hover:shadow-lg transition-shadow"
-                     onClick={() => trackButtonClick(`contact_info_${info.title.toLowerCase()}`, info.value)}
                    >
                      <div className="flex justify-center mb-4">
                        <div className="w-12 h-12 bg-lightAccent/10 dark:bg-darkAccent/10 rounded-lg flex items-center justify-center">
@@ -518,7 +500,6 @@ const Contact = () => {
                  <Button 
                    size="lg" 
                    onClick={() => {
-                     trackButtonClick('start_project_cta', 'contact_page');
                      document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
                    }}
                  >
@@ -529,7 +510,6 @@ const Contact = () => {
                    as="a" 
                    href="/about" 
                    size="lg"
-                   onClick={() => trackButtonClick('learn_more_cta', 'about_page')}
                  >
                    Learn More About Me
                  </Button>

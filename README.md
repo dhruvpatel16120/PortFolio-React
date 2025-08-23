@@ -1,6 +1,6 @@
 # 🚀 Portfolio Website v1.0
 
-A modern, responsive portfolio website built with React, featuring a comprehensive admin panel for content management. This project showcases full-stack development skills with Firebase backend, Cloudinary media management, and advanced analytics.
+A modern, responsive portfolio website built with React, featuring a comprehensive admin panel for content management. This project showcases full-stack development skills with Firebase backend and Cloudinary media management.
 
 ![Portfolio Preview](preview/home.png)
 
@@ -14,15 +14,12 @@ A modern, responsive portfolio website built with React, featuring a comprehensi
 - **Contact Form**: Integrated contact system with email notifications
 - **Project Showcase**: Dynamic project gallery with filtering and search
 - **Resume Download**: PDF resume with professional formatting
-- **Analytics Tracking**: User behavior and page view analytics
 
 ### 🔧 Admin Panel
 - **Secure Authentication**: Firebase Auth with role-based access control
 - **Content Management**: Dynamic content editing for all website sections
 - **Media Management**: Cloudinary integration for image/file uploads
 - **Contact Management**: View and respond to contact form submissions
-- **Analytics Dashboard**: Comprehensive website analytics and insights
-- **Settings Management**: Site configuration and security settings
 - **User Management**: Admin user creation and permission management
 
 ### 🛡️ Security Features
@@ -187,8 +184,6 @@ REACT_APP_CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 - **Content Management** (`/admin/content`) - Edit website content
 - **Contact Management** (`/admin/contact`) - View and respond to submissions
 - **Media Management** (`/admin/media`) - Upload and manage media files
-- **Analytics** (`/admin/analytics`) - Website analytics and insights
-- **Settings** (`/admin/settings`) - Site configuration and security
 
 ## 🎨 Customization
 
@@ -228,15 +223,6 @@ All content is managed through the admin panel or can be edited in:
 - Content Security Policy
 - XSS protection
 - CSRF protection
-
-## 📊 Analytics
-
-The website includes comprehensive analytics:
-- Page view tracking
-- User behavior analysis
-- Contact form analytics
-- Performance metrics
-- Error tracking
 
 ## 🚀 Deployment
 
