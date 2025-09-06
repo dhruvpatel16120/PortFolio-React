@@ -5,14 +5,14 @@ require('dotenv').config();
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID
+  apiKey: "AIzaSyAdIIh3QscNAKaVPKt1qFUmrVopsZG97Uo",
+  authDomain: "portfolio-dhruv-patel.firebaseapp.com",
+  projectId: "portfolio-dhruv-patel",
+  storageBucket: "portfolio-dhruv-patel.firebasestorage.app",
+  messagingSenderId: "762157838251",
+  appId: "1:762157838251:web:2e65180fe9969edfa96cee"
 };
-
+ 
 // Validate environment variables
 function validateEnvironment() {
   const requiredVars = [
@@ -83,11 +83,11 @@ async function createAdminUser() {
     console.log('🚀 Starting admin user creation...\n');
 
     // Validate environment
-    validateEnvironment();
+    // validateEnvironment();
 
-    const email = process.env.REACT_APP_ADMIN_EMAIL;
-    const password = process.env.REACT_APP_ADMIN_PASSWORD;
-    const role = process.env.REACT_APP_ADMIN_ROLE || 'super_admin';
+    const email = "dhruvpatel16120@gmail.com";
+    const password = "Root@123";
+    const role = "super_admin";
 
     // Validate email
     if (!validateEmail(email)) {
